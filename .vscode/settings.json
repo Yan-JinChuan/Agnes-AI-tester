@@ -1,0 +1,14 @@
+{
+  "java.configuration.updateBuildConfiguration": "disabled",
+  "dart.runPubGetOnStartup": false,
+  "dart.runPubGetOnPubspecChanges": "never",
+  "java.import.gradle.wrapper.enabled": true,
+  "java.import.gradle.version": "8.14.3",
+  "dart.flutterSdkPath": ".fvm/versions/3.47.4",
+
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.dart": "${capture}.freezed.dart, ${capture}.g.dart"
+  }
+}
