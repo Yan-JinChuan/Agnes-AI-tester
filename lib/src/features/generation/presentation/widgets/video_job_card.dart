@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/cache/app_media_cache.dart';
+import '../../domain/models/video_generation_options.dart';
 import '../../domain/models/video_generation_record.dart';
 import '../extensions/video_job_status_ui_extension.dart';
 import 'cached_video_player.dart';
@@ -53,8 +54,7 @@ class VideoJobCard extends StatelessWidget {
             Text(record.prompt, style: TextStyle(color: Colors.grey.shade700)),
             const SizedBox(height: 12),
             Text(
-              '请求参数：${record.options.width} × ${record.options.height} · '
-              '${record.options.numFrames} 帧 · ${_formatFrameRate(record.options.frameRate)} fps',
+              _formatRequest(record),
               style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
             ),
             if (job.actualSize != null || job.seconds != null) ...[
@@ -130,4 +130,14 @@ String _formatFrameRate(double value) {
   return value == value.roundToDouble()
       ? value.toInt().toString()
       : value.toString();
+}
+
+String _formatRequest(VideoGenerationRecord record) {
+  final options = record.options;
+  if (isAgnesVideo25OrLater(record.model)) {
+    return '请求参数：${options.mode ?? 'text'} · ${options.seconds} 秒 · '
+        '${options.size} · ${options.aspectRatio}';
+  }
+  return '请求参数：${options.width} × ${options.height} · '
+      '${options.numFrames} 帧 · ${_formatFrameRate(options.frameRate)} fps';
 }

@@ -148,6 +148,22 @@ class VideoRepositoryImpl implements VideoRepository {
       'image_url': options.imageUrl,
       'mode': options.mode,
       'keyframe_urls': options.keyframeUrls,
+      'seconds': options.seconds,
+      'size': options.size,
+      'aspect_ratio': options.aspectRatio,
+      'first_frame': options.firstFrame,
+      'last_frame': options.lastFrame,
+      'image_urls': options.imageUrls,
+      'audio_urls': options.audioUrls,
+      'reference_videos': options.referenceVideos
+          .map(
+            (video) => {
+              'url': video.url,
+              'start_seconds': video.startSeconds,
+              'require_audio': video.requireAudio,
+            },
+          )
+          .toList(),
     };
   }
 
@@ -160,6 +176,9 @@ class VideoRepositoryImpl implements VideoRepository {
       if (decoded is Map) {
         final map = Map<String, dynamic>.from(decoded);
         final keyframes = map['keyframe_urls'];
+        final images = map['image_urls'];
+        final audios = map['audio_urls'];
+        final videos = map['reference_videos'];
         return VideoGenerationOptions(
           width: _intValue(map['width'], 1152),
           height: _intValue(map['height'], 768),
@@ -172,6 +191,30 @@ class VideoRepositoryImpl implements VideoRepository {
           mode: _nullableText(map['mode']),
           keyframeUrls: keyframes is List
               ? keyframes.whereType<String>().toList()
+              : const [],
+          seconds: _nullableText(map['seconds']) ?? '5',
+          size: _nullableText(map['size']) ?? '720P',
+          aspectRatio: _nullableText(map['aspect_ratio']) ?? '16:9',
+          firstFrame: _nullableText(map['first_frame']),
+          lastFrame: _nullableText(map['last_frame']),
+          imageUrls: images is List
+              ? images.whereType<String>().toList()
+              : const [],
+          audioUrls: audios is List
+              ? audios.whereType<String>().toList()
+              : const [],
+          referenceVideos: videos is List
+              ? videos
+                    .whereType<Map>()
+                    .map(
+                      (video) => VideoReference(
+                        url: video['url']?.toString() ?? '',
+                        startSeconds: _doubleValue(video['start_seconds'], 0),
+                        requireAudio: video['require_audio'] == true,
+                      ),
+                    )
+                    .where((video) => video.url.isNotEmpty)
+                    .toList()
               : const [],
         );
       }

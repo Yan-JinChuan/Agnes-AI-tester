@@ -28,20 +28,20 @@ $VideoCreateRequestCopyWith<VideoCreateRequest> get copyWith => _$VideoCreateReq
 @override
 bool operator ==(Object other) {
   final _this = this as VideoCreateRequest;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VideoCreateRequest&&(identical(other.model, _this.model) || other.model == _this.model)&&(identical(other.prompt, _this.prompt) || other.prompt == _this.prompt)&&(identical(other.width, _this.width) || other.width == _this.width)&&(identical(other.height, _this.height) || other.height == _this.height)&&(identical(other.numFrames, _this.numFrames) || other.numFrames == _this.numFrames)&&(identical(other.frameRate, _this.frameRate) || other.frameRate == _this.frameRate)&&(identical(other.numInferenceSteps, _this.numInferenceSteps) || other.numInferenceSteps == _this.numInferenceSteps)&&(identical(other.seed, _this.seed) || other.seed == _this.seed)&&(identical(other.negativePrompt, _this.negativePrompt) || other.negativePrompt == _this.negativePrompt)&&(identical(other.image, _this.image) || other.image == _this.image)&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&const DeepCollectionEquality().equals(other.extraBody, _this.extraBody));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VideoCreateRequest&&(identical(other.model, _this.model) || other.model == _this.model)&&(identical(other.prompt, _this.prompt) || other.prompt == _this.prompt)&&(identical(other.width, _this.width) || other.width == _this.width)&&(identical(other.height, _this.height) || other.height == _this.height)&&(identical(other.numFrames, _this.numFrames) || other.numFrames == _this.numFrames)&&(identical(other.frameRate, _this.frameRate) || other.frameRate == _this.frameRate)&&(identical(other.numInferenceSteps, _this.numInferenceSteps) || other.numInferenceSteps == _this.numInferenceSteps)&&(identical(other.seed, _this.seed) || other.seed == _this.seed)&&(identical(other.negativePrompt, _this.negativePrompt) || other.negativePrompt == _this.negativePrompt)&&(identical(other.image, _this.image) || other.image == _this.image)&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.seconds, _this.seconds) || other.seconds == _this.seconds)&&(identical(other.size, _this.size) || other.size == _this.size)&&(identical(other.aspectRatio, _this.aspectRatio) || other.aspectRatio == _this.aspectRatio)&&(identical(other.firstFrame, _this.firstFrame) || other.firstFrame == _this.firstFrame)&&(identical(other.lastFrame, _this.lastFrame) || other.lastFrame == _this.lastFrame)&&const DeepCollectionEquality().equals(other.images, _this.images)&&const DeepCollectionEquality().equals(other.audios, _this.audios)&&const DeepCollectionEquality().equals(other.videos, _this.videos)&&(identical(other.n, _this.n) || other.n == _this.n)&&const DeepCollectionEquality().equals(other.extraBody, _this.extraBody));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as VideoCreateRequest;
-  return Object.hash(runtimeType,_this.model,_this.prompt,_this.width,_this.height,_this.numFrames,_this.frameRate,_this.numInferenceSteps,_this.seed,_this.negativePrompt,_this.image,_this.mode,const DeepCollectionEquality().hash(_this.extraBody));
+  return Object.hashAll([runtimeType,_this.model,_this.prompt,_this.width,_this.height,_this.numFrames,_this.frameRate,_this.numInferenceSteps,_this.seed,_this.negativePrompt,_this.image,_this.mode,_this.seconds,_this.size,_this.aspectRatio,_this.firstFrame,_this.lastFrame,const DeepCollectionEquality().hash(_this.images),const DeepCollectionEquality().hash(_this.audios),const DeepCollectionEquality().hash(_this.videos),_this.n,const DeepCollectionEquality().hash(_this.extraBody)]);
 }
 
 @override
 String toString() {
   final _this = this as VideoCreateRequest;
-  return 'VideoCreateRequest(model: ${_this.model}, prompt: ${_this.prompt}, width: ${_this.width}, height: ${_this.height}, numFrames: ${_this.numFrames}, frameRate: ${_this.frameRate}, numInferenceSteps: ${_this.numInferenceSteps}, seed: ${_this.seed}, negativePrompt: ${_this.negativePrompt}, image: ${_this.image}, mode: ${_this.mode}, extraBody: ${_this.extraBody})';
+  return 'VideoCreateRequest(model: ${_this.model}, prompt: ${_this.prompt}, width: ${_this.width}, height: ${_this.height}, numFrames: ${_this.numFrames}, frameRate: ${_this.frameRate}, numInferenceSteps: ${_this.numInferenceSteps}, seed: ${_this.seed}, negativePrompt: ${_this.negativePrompt}, image: ${_this.image}, mode: ${_this.mode}, seconds: ${_this.seconds}, size: ${_this.size}, aspectRatio: ${_this.aspectRatio}, firstFrame: ${_this.firstFrame}, lastFrame: ${_this.lastFrame}, images: ${_this.images}, audios: ${_this.audios}, videos: ${_this.videos}, n: ${_this.n}, extraBody: ${_this.extraBody})';
 }
 
 
@@ -52,7 +52,7 @@ abstract mixin class $VideoCreateRequestCopyWith<$Res>  {
   factory $VideoCreateRequestCopyWith(VideoCreateRequest value, $Res Function(VideoCreateRequest) _then) = _$VideoCreateRequestCopyWithImpl;
 @useResult
 $Res call({
- String model, String prompt, int width, int height,@JsonKey(name: 'num_frames') int numFrames,@JsonKey(name: 'frame_rate') double frameRate,@JsonKey(name: 'num_inference_steps', includeIfNull: false) int? numInferenceSteps,@JsonKey(includeIfNull: false) int? seed,@JsonKey(name: 'negative_prompt', includeIfNull: false) String? negativePrompt,@JsonKey(includeIfNull: false) String? image,@JsonKey(includeIfNull: false) String? mode,@JsonKey(name: 'extra_body', includeIfNull: false) Map<String, dynamic>? extraBody
+ String model, String prompt, int? width, int? height,@JsonKey(name: 'num_frames') int? numFrames,@JsonKey(name: 'frame_rate') double? frameRate,@JsonKey(name: 'num_inference_steps', includeIfNull: false) int? numInferenceSteps,@JsonKey(includeIfNull: false) int? seed,@JsonKey(name: 'negative_prompt', includeIfNull: false) String? negativePrompt,@JsonKey(includeIfNull: false) String? image,@JsonKey(includeIfNull: false) String? mode,@JsonKey(includeIfNull: false) String? seconds,@JsonKey(includeIfNull: false) String? size,@JsonKey(name: 'aspect_ratio', includeIfNull: false) String? aspectRatio,@JsonKey(name: 'first_frame', includeIfNull: false) String? firstFrame,@JsonKey(name: 'last_frame', includeIfNull: false) String? lastFrame,@JsonKey(includeIfNull: false) List<String>? images,@JsonKey(includeIfNull: false) List<String>? audios,@JsonKey(includeIfNull: false) List<Map<String, dynamic>>? videos,@JsonKey(includeIfNull: false) int? n,@JsonKey(name: 'extra_body', includeIfNull: false) Map<String, dynamic>? extraBody
 });
 
 
@@ -69,20 +69,29 @@ class _$VideoCreateRequestCopyWithImpl<$Res>
 
 /// Create a copy of VideoCreateRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? model = null,Object? prompt = null,Object? width = null,Object? height = null,Object? numFrames = null,Object? frameRate = null,Object? numInferenceSteps = freezed,Object? seed = freezed,Object? negativePrompt = freezed,Object? image = freezed,Object? mode = freezed,Object? extraBody = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? model = null,Object? prompt = null,Object? width = freezed,Object? height = freezed,Object? numFrames = freezed,Object? frameRate = freezed,Object? numInferenceSteps = freezed,Object? seed = freezed,Object? negativePrompt = freezed,Object? image = freezed,Object? mode = freezed,Object? seconds = freezed,Object? size = freezed,Object? aspectRatio = freezed,Object? firstFrame = freezed,Object? lastFrame = freezed,Object? images = freezed,Object? audios = freezed,Object? videos = freezed,Object? n = freezed,Object? extraBody = freezed,}) {
   return _then(VideoCreateRequest(
 model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
 as String,prompt: null == prompt ? _self.prompt : prompt // ignore: cast_nullable_to_non_nullable
-as String,width: null == width ? _self.width : width // ignore: cast_nullable_to_non_nullable
-as int,height: null == height ? _self.height : height // ignore: cast_nullable_to_non_nullable
-as int,numFrames: null == numFrames ? _self.numFrames : numFrames // ignore: cast_nullable_to_non_nullable
-as int,frameRate: null == frameRate ? _self.frameRate : frameRate // ignore: cast_nullable_to_non_nullable
-as double,numInferenceSteps: freezed == numInferenceSteps ? _self.numInferenceSteps : numInferenceSteps // ignore: cast_nullable_to_non_nullable
+as String,width: freezed == width ? _self.width : width // ignore: cast_nullable_to_non_nullable
+as int?,height: freezed == height ? _self.height : height // ignore: cast_nullable_to_non_nullable
+as int?,numFrames: freezed == numFrames ? _self.numFrames : numFrames // ignore: cast_nullable_to_non_nullable
+as int?,frameRate: freezed == frameRate ? _self.frameRate : frameRate // ignore: cast_nullable_to_non_nullable
+as double?,numInferenceSteps: freezed == numInferenceSteps ? _self.numInferenceSteps : numInferenceSteps // ignore: cast_nullable_to_non_nullable
 as int?,seed: freezed == seed ? _self.seed : seed // ignore: cast_nullable_to_non_nullable
 as int?,negativePrompt: freezed == negativePrompt ? _self.negativePrompt : negativePrompt // ignore: cast_nullable_to_non_nullable
 as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
 as String?,mode: freezed == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
-as String?,extraBody: freezed == extraBody ? _self.extraBody : extraBody // ignore: cast_nullable_to_non_nullable
+as String?,seconds: freezed == seconds ? _self.seconds : seconds // ignore: cast_nullable_to_non_nullable
+as String?,size: freezed == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
+as String?,aspectRatio: freezed == aspectRatio ? _self.aspectRatio : aspectRatio // ignore: cast_nullable_to_non_nullable
+as String?,firstFrame: freezed == firstFrame ? _self.firstFrame : firstFrame // ignore: cast_nullable_to_non_nullable
+as String?,lastFrame: freezed == lastFrame ? _self.lastFrame : lastFrame // ignore: cast_nullable_to_non_nullable
+as String?,images: freezed == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
+as List<String>?,audios: freezed == audios ? _self.audios : audios // ignore: cast_nullable_to_non_nullable
+as List<String>?,videos: freezed == videos ? _self.videos : videos // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,n: freezed == n ? _self.n : n // ignore: cast_nullable_to_non_nullable
+as int?,extraBody: freezed == extraBody ? _self.extraBody : extraBody // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>?,
   ));
 }
@@ -654,20 +663,20 @@ $VideoSizeMappingCopyWith<VideoSizeMapping> get copyWith => _$VideoSizeMappingCo
 @override
 bool operator ==(Object other) {
   final _this = this as VideoSizeMapping;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VideoSizeMapping&&(identical(other.actualSize, _this.actualSize) || other.actualSize == _this.actualSize)&&(identical(other.message, _this.message) || other.message == _this.message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VideoSizeMapping&&(identical(other.actualSize, _this.actualSize) || other.actualSize == _this.actualSize)&&(identical(other.width, _this.width) || other.width == _this.width)&&(identical(other.height, _this.height) || other.height == _this.height)&&(identical(other.resolution, _this.resolution) || other.resolution == _this.resolution)&&(identical(other.ratio, _this.ratio) || other.ratio == _this.ratio)&&(identical(other.message, _this.message) || other.message == _this.message));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as VideoSizeMapping;
-  return Object.hash(runtimeType,_this.actualSize,_this.message);
+  return Object.hash(runtimeType,_this.actualSize,_this.width,_this.height,_this.resolution,_this.ratio,_this.message);
 }
 
 @override
 String toString() {
   final _this = this as VideoSizeMapping;
-  return 'VideoSizeMapping(actualSize: ${_this.actualSize}, message: ${_this.message})';
+  return 'VideoSizeMapping(actualSize: ${_this.actualSize}, width: ${_this.width}, height: ${_this.height}, resolution: ${_this.resolution}, ratio: ${_this.ratio}, message: ${_this.message})';
 }
 
 
@@ -678,7 +687,7 @@ abstract mixin class $VideoSizeMappingCopyWith<$Res>  {
   factory $VideoSizeMappingCopyWith(VideoSizeMapping value, $Res Function(VideoSizeMapping) _then) = _$VideoSizeMappingCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'actual_size') String? actualSize, String? message
+@JsonKey(name: 'actual_size') String? actualSize, int? width, int? height, String? resolution, String? ratio, String? message
 });
 
 
@@ -695,9 +704,13 @@ class _$VideoSizeMappingCopyWithImpl<$Res>
 
 /// Create a copy of VideoSizeMapping
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? actualSize = freezed,Object? message = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? actualSize = freezed,Object? width = freezed,Object? height = freezed,Object? resolution = freezed,Object? ratio = freezed,Object? message = freezed,}) {
   return _then(VideoSizeMapping(
 actualSize: freezed == actualSize ? _self.actualSize : actualSize // ignore: cast_nullable_to_non_nullable
+as String?,width: freezed == width ? _self.width : width // ignore: cast_nullable_to_non_nullable
+as int?,height: freezed == height ? _self.height : height // ignore: cast_nullable_to_non_nullable
+as int?,resolution: freezed == resolution ? _self.resolution : resolution // ignore: cast_nullable_to_non_nullable
+as String?,ratio: freezed == ratio ? _self.ratio : ratio // ignore: cast_nullable_to_non_nullable
 as String?,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

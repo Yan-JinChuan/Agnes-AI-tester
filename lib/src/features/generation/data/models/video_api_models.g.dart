@@ -6,21 +6,33 @@ part of 'video_api_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-VideoCreateRequest _$VideoCreateRequestFromJson(Map<String, dynamic> json) =>
-    VideoCreateRequest(
-      model: json['model'] as String,
-      prompt: json['prompt'] as String,
-      width: (json['width'] as num).toInt(),
-      height: (json['height'] as num).toInt(),
-      numFrames: (json['num_frames'] as num).toInt(),
-      frameRate: (json['frame_rate'] as num).toDouble(),
-      numInferenceSteps: (json['num_inference_steps'] as num?)?.toInt(),
-      seed: (json['seed'] as num?)?.toInt(),
-      negativePrompt: json['negative_prompt'] as String?,
-      image: json['image'] as String?,
-      mode: json['mode'] as String?,
-      extraBody: json['extra_body'] as Map<String, dynamic>?,
-    );
+VideoCreateRequest _$VideoCreateRequestFromJson(
+  Map<String, dynamic> json,
+) => VideoCreateRequest(
+  model: json['model'] as String,
+  prompt: json['prompt'] as String,
+  width: (json['width'] as num?)?.toInt(),
+  height: (json['height'] as num?)?.toInt(),
+  numFrames: (json['num_frames'] as num?)?.toInt(),
+  frameRate: (json['frame_rate'] as num?)?.toDouble(),
+  numInferenceSteps: (json['num_inference_steps'] as num?)?.toInt(),
+  seed: (json['seed'] as num?)?.toInt(),
+  negativePrompt: json['negative_prompt'] as String?,
+  image: json['image'] as String?,
+  mode: json['mode'] as String?,
+  seconds: json['seconds'] as String?,
+  size: json['size'] as String?,
+  aspectRatio: json['aspect_ratio'] as String?,
+  firstFrame: json['first_frame'] as String?,
+  lastFrame: json['last_frame'] as String?,
+  images: (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  audios: (json['audios'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  videos: (json['videos'] as List<dynamic>?)
+      ?.map((e) => e as Map<String, dynamic>)
+      .toList(),
+  n: (json['n'] as num?)?.toInt(),
+  extraBody: json['extra_body'] as Map<String, dynamic>?,
+);
 
 VideoJobResponse _$VideoJobResponseFromJson(Map<String, dynamic> json) =>
     VideoJobResponse(
@@ -59,5 +71,9 @@ VideoMetadata _$VideoMetadataFromJson(Map<String, dynamic> json) =>
 VideoSizeMapping _$VideoSizeMappingFromJson(Map<String, dynamic> json) =>
     VideoSizeMapping(
       actualSize: json['actual_size'] as String?,
+      width: (json['width'] as num?)?.toInt(),
+      height: (json['height'] as num?)?.toInt(),
+      resolution: json['resolution'] as String?,
+      ratio: json['ratio'] as String?,
       message: json['message'] as String?,
     );

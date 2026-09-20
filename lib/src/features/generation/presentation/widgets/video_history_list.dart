@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/models/video_generation_options.dart';
 import '../../domain/models/video_generation_record.dart';
 import '../extensions/video_job_status_ui_extension.dart';
 
@@ -56,7 +57,7 @@ class VideoHistoryList extends StatelessWidget {
                             Text(
                               '${record.status.displayLabel} · '
                               '${record.progress}% · '
-                              '${record.options.width}×${record.options.height} · '
+                              '${_formatVideoSettings(record)} · '
                               '${_formatVideoDate(record.updatedAt)}',
                               style: TextStyle(
                                 color: Colors.grey.shade600,
@@ -77,6 +78,13 @@ class VideoHistoryList extends StatelessWidget {
       ],
     );
   }
+}
+
+String _formatVideoSettings(VideoGenerationRecord record) {
+  if (isAgnesVideo25OrLater(record.model)) {
+    return '${record.options.size} · ${record.options.aspectRatio}';
+  }
+  return '${record.options.width}×${record.options.height}';
 }
 
 String _formatVideoDate(DateTime value) {

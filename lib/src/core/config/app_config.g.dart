@@ -11,7 +11,7 @@ AppConfig _$AppConfigFromJson(Map<String, dynamic> json) => AppConfig(
   baseUrl: json['base_url'] as String? ?? "https://apihub.agnes-ai.com/v1",
   textModel: json['text_model'] as String? ?? "agnes-2.5-flash",
   imageModel: json['image_model'] as String? ?? "agnes-image-2.1-flash",
-  videoModel: json['video_model'] as String? ?? "agnes-video-v2.0",
+  videoModel: json['video_model'] as String? ?? "agnes-video-2.5",
   cacheDirectory: json['cache_directory'] as String? ?? "",
 );
 

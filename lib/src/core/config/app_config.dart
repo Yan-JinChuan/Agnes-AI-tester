@@ -10,7 +10,7 @@ class const AppConfig({
   final String baseUrl = "https://apihub.agnes-ai.com/v1",
   final String textModel = "agnes-2.5-flash",
   final String imageModel = "agnes-image-2.1-flash",
-  final String videoModel = "agnes-video-v2.0",
+  final String videoModel = "agnes-video-2.5",
   final String cacheDirectory = "",
 }) with _$AppConfig {
   factory AppConfig.fromJson(Map<String, dynamic> json) =>

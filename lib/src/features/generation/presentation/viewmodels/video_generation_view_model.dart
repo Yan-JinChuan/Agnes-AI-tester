@@ -29,6 +29,16 @@ class const VideoState({
   final String numInferenceSteps = '',
   final String seed = '',
   final String negativePrompt = '',
+  final String seconds = '5',
+  final String size = '720P',
+  final String aspectRatio = '16:9',
+  final String firstFrame = '',
+  final String lastFrame = '',
+  final String imageUrls = '',
+  final String audioUrls = '',
+  final String referenceVideoUrl = '',
+  final String referenceVideoStartSeconds = '0',
+  final bool referenceVideoRequireAudio = false,
   final VideoJob? job,
   final List<VideoGenerationRecord> history = const [],
   final bool isLoading = false,
@@ -70,7 +80,17 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
 
   void setFrameRate(String value) => state = state.copyWith(frameRate: value);
 
-  void setMode(String? value) => state = state.copyWith(mode: value ?? '');
+  void setMode(String? value) {
+    final mode = value ?? '';
+    state = state.copyWith(
+      mode: mode,
+      firstFrame: mode == 'keyframe' ? state.firstFrame : '',
+      lastFrame: mode == 'keyframe' ? state.lastFrame : '',
+      imageUrls: mode == 'reference' ? state.imageUrls : '',
+      audioUrls: mode == 'reference' ? state.audioUrls : '',
+      referenceVideoUrl: mode == 'reference' ? state.referenceVideoUrl : '',
+    );
+  }
 
   void setImageUrl(String value) => state = state.copyWith(imageUrl: value);
 
@@ -84,6 +104,33 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
 
   void setNegativePrompt(String value) =>
       state = state.copyWith(negativePrompt: value);
+
+  void setSeconds(String value) => state = state.copyWith(seconds: value);
+
+  void setSize(String? value) {
+    if (value != null) state = state.copyWith(size: value);
+  }
+
+  void setAspectRatio(String? value) {
+    if (value != null) state = state.copyWith(aspectRatio: value);
+  }
+
+  void setFirstFrame(String value) => state = state.copyWith(firstFrame: value);
+
+  void setLastFrame(String value) => state = state.copyWith(lastFrame: value);
+
+  void setImageUrls(String value) => state = state.copyWith(imageUrls: value);
+
+  void setAudioUrls(String value) => state = state.copyWith(audioUrls: value);
+
+  void setReferenceVideoUrl(String value) =>
+      state = state.copyWith(referenceVideoUrl: value);
+
+  void setReferenceVideoStartSeconds(String value) =>
+      state = state.copyWith(referenceVideoStartSeconds: value);
+
+  void setReferenceVideoRequireAudio(bool value) =>
+      state = state.copyWith(referenceVideoRequireAudio: value);
 
   void setDimensionPreset(String? value) {
     if (value == null) return;
@@ -119,10 +166,96 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
     }
   }
 
-  Future<void> create() async {
+  Future<void> create({String model = 'agnes-video-v2.0'}) async {
     final prompt = state.prompt.trim();
     if (state.isLoading || prompt.isEmpty) return;
 
+    if (isAgnesVideo25OrLater(model)) {
+      await _createModern(prompt: prompt);
+      return;
+    }
+    await _createLegacy(prompt: prompt);
+  }
+
+  Future<void> _createModern({required String prompt}) async {
+    const modes = {'text', 'keyframe', 'reference'};
+    const sizes = {'720P', '1080P', '1K', '2K'};
+    const aspectRatios = {'21:9', '16:9', '4:3', '1:1', '3:4', '9:16'};
+    final mode = modes.contains(state.mode) ? state.mode : 'text';
+    final seconds = int.tryParse(state.seconds.trim());
+    final imageUrls = _parseUrls(state.imageUrls);
+    final audioUrls = _parseUrls(state.audioUrls);
+    final firstFrame = _nullableText(state.firstFrame);
+    final lastFrame = _nullableText(state.lastFrame);
+    final referenceVideoUrl = _nullableText(state.referenceVideoUrl);
+    final hasReferenceMedia =
+        imageUrls.isNotEmpty ||
+        audioUrls.isNotEmpty ||
+        referenceVideoUrl != null;
+
+    if (!modes.contains(mode)) {
+      _setValidationError('2.5 模式必须是 text、keyframe 或 reference。');
+      return;
+    }
+    if (seconds == null || seconds < 4 || seconds > 12) {
+      _setValidationError('seconds 必须是 4 到 12 之间的整数。');
+      return;
+    }
+    if (!sizes.contains(state.size)) {
+      _setValidationError('size 必须是 720P、1080P、1K 或 2K。');
+      return;
+    }
+    if (!aspectRatios.contains(state.aspectRatio)) {
+      _setValidationError('aspect_ratio 不是 Agnes Video 2.5 支持的画幅。');
+      return;
+    }
+    if (imageUrls.length > 8 || audioUrls.length > 3) {
+      _setValidationError('2.5 最多支持 8 张图片和 3 段音频参考。');
+      return;
+    }
+    if (mode == 'keyframe' && firstFrame == null && lastFrame == null) {
+      _setValidationError('keyframe 模式至少需要填写首帧或尾帧 URL。');
+      return;
+    }
+    if (mode == 'keyframe' && hasReferenceMedia) {
+      _setValidationError('keyframe 模式不能同时填写图片、音频或视频参考。');
+      return;
+    }
+    if (mode == 'reference' && !hasReferenceMedia) {
+      _setValidationError('reference 模式至少需要一种参考媒体。');
+      return;
+    }
+    if (mode == 'reference' && (firstFrame != null || lastFrame != null)) {
+      _setValidationError('reference 模式不能同时填写首帧或尾帧。');
+      return;
+    }
+
+    final referenceVideos = referenceVideoUrl == null
+        ? const <VideoReference>[]
+        : [
+            VideoReference(
+              url: referenceVideoUrl,
+              startSeconds:
+                  double.tryParse(state.referenceVideoStartSeconds.trim()) ?? 0,
+              requireAudio: state.referenceVideoRequireAudio,
+            ),
+          ];
+    final options = VideoGenerationOptions(
+      seed: int.tryParse(state.seed.trim()),
+      mode: mode,
+      seconds: seconds.toString(),
+      size: state.size,
+      aspectRatio: state.aspectRatio,
+      firstFrame: firstFrame,
+      lastFrame: lastFrame,
+      imageUrls: imageUrls,
+      audioUrls: audioUrls,
+      referenceVideos: referenceVideos,
+    );
+    await _submit(prompt: prompt, options: options);
+  }
+
+  Future<void> _createLegacy({required String prompt}) async {
     final width = int.tryParse(state.width.trim());
     final height = int.tryParse(state.height.trim());
     final numFrames = int.tryParse(state.numFrames.trim());
@@ -145,11 +278,6 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
       return;
     }
 
-    final keyframeUrls = state.keyframeUrls
-        .split(RegExp(r'[\n,]+'))
-        .map((value) => value.trim())
-        .where((value) => value.isNotEmpty)
-        .toList();
     final options = VideoGenerationOptions(
       width: width,
       height: height,
@@ -162,9 +290,15 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
           : state.negativePrompt.trim(),
       imageUrl: state.imageUrl.trim().isEmpty ? null : state.imageUrl.trim(),
       mode: state.mode.isEmpty ? null : state.mode,
-      keyframeUrls: keyframeUrls,
+      keyframeUrls: _parseUrls(state.keyframeUrls),
     );
+    await _submit(prompt: prompt, options: options);
+  }
 
+  Future<void> _submit({
+    required String prompt,
+    required VideoGenerationOptions options,
+  }) async {
     state = state.copyWith(isLoading: true, error: null, job: null);
     try {
       final record = await _repository.create(prompt: prompt, options: options);
@@ -180,6 +314,19 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
         error: readableErrorMessage(error),
       );
     }
+  }
+
+  List<String> _parseUrls(String value) {
+    return value
+        .split(RegExp(r'[\n,]+'))
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
+  }
+
+  String? _nullableText(String value) {
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 
   Future<void> poll() async {

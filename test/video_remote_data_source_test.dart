@@ -121,6 +121,53 @@ void main() {
     expect(job.metadataMessage, 'mapped to 480p/16:9');
   });
 
+  test('Video 2.5 request uses the new mode and media fields', () {
+    const options = VideoGenerationOptions(
+      mode: 'reference',
+      seconds: '8',
+      size: '1080P',
+      aspectRatio: '9:16',
+      seed: 7,
+      imageUrls: ['https://example.com/character.png'],
+      audioUrls: ['https://example.com/music.mp3'],
+      referenceVideos: [
+        VideoReference(
+          url: 'https://example.com/motion.mp4',
+          startSeconds: 2.5,
+          requireAudio: true,
+        ),
+      ],
+    );
+
+    final json = VideoCreateRequest.fromDomain(
+      model: 'agnes-video-2.5',
+      prompt: 'Follow the reference rhythm',
+      options: options,
+    ).toJson();
+
+    expect(json, {
+      'model': 'agnes-video-2.5',
+      'prompt': 'Follow the reference rhythm',
+      'seed': 7,
+      'mode': 'reference',
+      'seconds': '8',
+      'size': '1080P',
+      'aspect_ratio': '9:16',
+      'images': ['https://example.com/character.png'],
+      'audios': ['https://example.com/music.mp3'],
+      'videos': [
+        {
+          'url': 'https://example.com/motion.mp4',
+          'start_seconds': 2.5,
+          'require_audio': true,
+        },
+      ],
+      'n': 1,
+    });
+    expect(json.containsKey('width'), false);
+    expect(json.containsKey('num_frames'), false);
+  });
+
   test('Video response accepts seconds encoded as a string', () {
     final response = VideoJobResponse.fromJson({
       'id': 'task_OX5DfwgCFdkiJe8Sz6h3lkfXxH45b9Go',
