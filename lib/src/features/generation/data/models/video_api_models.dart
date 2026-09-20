@@ -1,9 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../domain/models/video_generation_options.dart';
+import '../../domain/models/video_job.dart';
+import '../../domain/models/video_job_status.dart';
+
 part 'video_api_models.freezed.dart';
 part 'video_api_models.g.dart';
 
 @Freezed(toJson: false)
+@JsonSerializable(createToJson: false)
 class const VideoCreateRequest({
   required final String model,
   required final String prompt,
@@ -21,6 +26,32 @@ class const VideoCreateRequest({
   @JsonKey(name: 'extra_body', includeIfNull: false)
   final Map<String, dynamic>? extraBody,
 }) with _$VideoCreateRequest {
+  factory VideoCreateRequest.fromDomain({
+    required String model,
+    required String prompt,
+    required VideoGenerationOptions options,
+  }) {
+    return VideoCreateRequest(
+      model: model,
+      prompt: prompt,
+      width: options.width,
+      height: options.height,
+      numFrames: options.numFrames,
+      frameRate: options.frameRate,
+      numInferenceSteps: options.numInferenceSteps,
+      seed: options.seed,
+      negativePrompt: _trimmed(options.negativePrompt),
+      image: _trimmed(options.imageUrl),
+      mode: _trimmed(options.mode),
+      extraBody: options.keyframeUrls.isEmpty
+          ? null
+          : {
+              'image': options.keyframeUrls,
+              'mode': _trimmed(options.mode) ?? 'keyframes',
+            },
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'model': model,
     'prompt': prompt,
@@ -41,32 +72,71 @@ class const VideoCreateRequest({
 }
 
 @Freezed(toJson: false)
+@JsonSerializable(createToJson: false)
 class const VideoJobResponse({
   @JsonKey(name: 'video_id') final String? videoId,
   final String? id,
   @JsonKey(name: 'task_id') final String? taskId,
   final String? status,
   final String? state,
-  final num? progress,
-  final num? percent,
-  @JsonKey(name: 'progress_percent') final num? progressPercent,
+  @JsonKey(fromJson: _numFromJson) final num? progress,
+  @JsonKey(fromJson: _numFromJson) final num? percent,
+  @JsonKey(name: 'progress_percent', fromJson: _numFromJson)
+  final num? progressPercent,
   final String? url,
   @JsonKey(name: 'video_url') final String? videoUrl,
   @JsonKey(name: 'videoUrl') final String? videoUrlCamel,
   final String? error,
   final String? message,
-  final num? seconds,
+  @JsonKey(fromJson: _numFromJson) final num? seconds,
   final String? size,
   final VideoMetadata? metadata,
 }) with _$VideoJobResponse {
+  VideoJob toDomain({String? fallbackId}) {
+    final metadataValue = metadata;
+    final sizeMapping = metadataValue?.sizeMapping;
+    final id = videoId ?? this.id ?? taskId ?? fallbackId;
+    if (id == null || id.isEmpty) {
+      throw const FormatException('视频接口没有返回 video_id。');
+    }
+    final rawProgress = progress ?? percent ?? progressPercent;
+    final rawUrl = url ?? videoUrl ?? videoUrlCamel ?? metadataValue?.url;
+    final rawError = error ?? message;
+    final rawSeconds = seconds ?? metadataValue?.seconds;
+    final rawSize = size ?? sizeMapping?.actualSize;
+    final rawMessage = sizeMapping?.message ?? metadataValue?.message;
+    return VideoJob(
+      id: id,
+      status: VideoJobStatus.fromWireValue(status ?? state),
+      progress: rawProgress?.round().clamp(0, 100) ?? 0,
+      url: _trimmed(rawUrl),
+      error: _trimmed(rawError),
+      actualSize: _trimmed(rawSize),
+      seconds: rawSeconds?.toDouble(),
+      metadataMessage: _trimmed(rawMessage),
+    );
+  }
+
   factory VideoJobResponse.fromJson(Map<String, dynamic> json) =>
       _$VideoJobResponseFromJson(json);
 }
 
+String? _trimmed(String? value) {
+  final trimmed = value?.trim();
+  return trimmed == null || trimmed.isEmpty ? null : trimmed;
+}
+
+num? _numFromJson(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value;
+  return num.tryParse(value.toString().trim());
+}
+
 @Freezed(toJson: false)
+@JsonSerializable(createToJson: false)
 class const VideoMetadata({
   final String? url,
-  final num? seconds,
+  @JsonKey(fromJson: _numFromJson) final num? seconds,
   final String? message,
   @JsonKey(name: 'size_mapping') final VideoSizeMapping? sizeMapping,
 }) with _$VideoMetadata {
@@ -75,6 +145,7 @@ class const VideoMetadata({
 }
 
 @Freezed(toJson: false)
+@JsonSerializable(createToJson: false)
 class const VideoSizeMapping({
   @JsonKey(name: 'actual_size') final String? actualSize,
   final String? message,

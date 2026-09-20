@@ -1,6 +1,6 @@
 import 'package:agnes_ai_tester/src/features/generation/domain/models/video_generation_options.dart';
 import 'package:agnes_ai_tester/src/features/generation/domain/models/video_generation_record.dart';
-import 'package:agnes_ai_tester/src/features/generation/domain/models/video_job.dart';
+import 'package:agnes_ai_tester/src/features/generation/domain/models/video_job_status.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agnes_ai_tester/src/features/generation/data/di/generation_data_providers.dart';
 import 'package:agnes_ai_tester/src/features/generation/data/datasources/video_local_data_source.dart';
 import 'package:agnes_ai_tester/src/features/generation/data/datasources/video_remote_data_source.dart';
+import 'package:agnes_ai_tester/src/features/generation/data/models/video_api_models.dart';
 import 'package:agnes_ai_tester/src/features/generation/data/repositories/video_repository_impl.dart';
 import 'package:agnes_ai_tester/src/features/generation/presentation/viewmodels/video_generation_view_model.dart';
 
@@ -115,7 +116,7 @@ VideoGenerationRecord _record(String videoId, String prompt) {
     videoId: videoId,
     prompt: prompt,
     model: 'test-model',
-    status: 'completed',
+    status: VideoJobStatus.completed,
     progress: 100,
     createdAt: now,
     updatedAt: now,
@@ -160,7 +161,7 @@ class _RecordingVideoRepository extends VideoRepositoryImpl {
       prompt: prompt,
       model: 'test-model',
       options: options,
-      status: 'queued',
+      status: VideoJobStatus.queued,
       progress: 0,
       createdAt: now,
       updatedAt: now,
@@ -170,13 +171,11 @@ class _RecordingVideoRepository extends VideoRepositoryImpl {
 
 class _UnusedVideoRemote implements VideoRemoteDataSource {
   @override
-  Future<VideoJob> create({
-    required String prompt,
-    required VideoGenerationOptions options,
-  }) => throw UnimplementedError();
+  Future<VideoJobResponse> create({required VideoCreateRequest request}) =>
+      throw UnimplementedError();
 
   @override
-  Future<VideoJob> poll({required String videoId}) =>
+  Future<VideoJobResponse> poll({required String videoId}) =>
       throw UnimplementedError();
 }
 

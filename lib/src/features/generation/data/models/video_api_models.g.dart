@@ -6,8 +6,8 @@ part of 'video_api_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_VideoCreateRequest _$VideoCreateRequestFromJson(Map<String, dynamic> json) =>
-    _VideoCreateRequest(
+VideoCreateRequest _$VideoCreateRequestFromJson(Map<String, dynamic> json) =>
+    VideoCreateRequest(
       model: json['model'] as String,
       prompt: json['prompt'] as String,
       width: (json['width'] as num).toInt(),
@@ -22,32 +22,32 @@ _VideoCreateRequest _$VideoCreateRequestFromJson(Map<String, dynamic> json) =>
       extraBody: json['extra_body'] as Map<String, dynamic>?,
     );
 
-_VideoJobResponse _$VideoJobResponseFromJson(Map<String, dynamic> json) =>
-    _VideoJobResponse(
+VideoJobResponse _$VideoJobResponseFromJson(Map<String, dynamic> json) =>
+    VideoJobResponse(
       videoId: json['video_id'] as String?,
       id: json['id'] as String?,
       taskId: json['task_id'] as String?,
       status: json['status'] as String?,
       state: json['state'] as String?,
-      progress: json['progress'] as num?,
-      percent: json['percent'] as num?,
-      progressPercent: json['progress_percent'] as num?,
+      progress: _numFromJson(json['progress']),
+      percent: _numFromJson(json['percent']),
+      progressPercent: _numFromJson(json['progress_percent']),
       url: json['url'] as String?,
       videoUrl: json['video_url'] as String?,
       videoUrlCamel: json['videoUrl'] as String?,
       error: json['error'] as String?,
       message: json['message'] as String?,
-      seconds: json['seconds'] as num?,
+      seconds: _numFromJson(json['seconds']),
       size: json['size'] as String?,
       metadata: json['metadata'] == null
           ? null
           : VideoMetadata.fromJson(json['metadata'] as Map<String, dynamic>),
     );
 
-_VideoMetadata _$VideoMetadataFromJson(Map<String, dynamic> json) =>
-    _VideoMetadata(
+VideoMetadata _$VideoMetadataFromJson(Map<String, dynamic> json) =>
+    VideoMetadata(
       url: json['url'] as String?,
-      seconds: json['seconds'] as num?,
+      seconds: _numFromJson(json['seconds']),
       message: json['message'] as String?,
       sizeMapping: json['size_mapping'] == null
           ? null
@@ -56,8 +56,8 @@ _VideoMetadata _$VideoMetadataFromJson(Map<String, dynamic> json) =>
             ),
     );
 
-_VideoSizeMapping _$VideoSizeMappingFromJson(Map<String, dynamic> json) =>
-    _VideoSizeMapping(
+VideoSizeMapping _$VideoSizeMappingFromJson(Map<String, dynamic> json) =>
+    VideoSizeMapping(
       actualSize: json['actual_size'] as String?,
       message: json['message'] as String?,
     );

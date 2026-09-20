@@ -6,24 +6,34 @@ part of 'chat_api_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_ChatCompletionRequest _$ChatCompletionRequestFromJson(
+ChatCompletionRequest _$ChatCompletionRequestFromJson(
   Map<String, dynamic> json,
-) => _ChatCompletionRequest(
+) => ChatCompletionRequest(
   model: json['model'] as String,
   messages: (json['messages'] as List<dynamic>)
       .map((e) => ChatMessagePayload.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 
-_ChatMessagePayload _$ChatMessagePayloadFromJson(Map<String, dynamic> json) =>
-    _ChatMessagePayload(
+Map<String, dynamic> _$ChatCompletionRequestToJson(
+  ChatCompletionRequest instance,
+) => <String, dynamic>{
+  'model': instance.model,
+  'messages': instance.messages.map((e) => e.toJson()).toList(),
+};
+
+ChatMessagePayload _$ChatMessagePayloadFromJson(Map<String, dynamic> json) =>
+    ChatMessagePayload(
       role: json['role'] as String,
       content: json['content'] as String,
     );
 
-_ChatCompletionResponse _$ChatCompletionResponseFromJson(
+Map<String, dynamic> _$ChatMessagePayloadToJson(ChatMessagePayload instance) =>
+    <String, dynamic>{'role': instance.role, 'content': instance.content};
+
+ChatCompletionResponse _$ChatCompletionResponseFromJson(
   Map<String, dynamic> json,
-) => _ChatCompletionResponse(
+) => ChatCompletionResponse(
   choices:
       (json['choices'] as List<dynamic>?)
           ?.map((e) => ChatCompletionChoice.fromJson(e as Map<String, dynamic>))
@@ -31,14 +41,14 @@ _ChatCompletionResponse _$ChatCompletionResponseFromJson(
       const [],
 );
 
-_ChatCompletionChoice _$ChatCompletionChoiceFromJson(
+ChatCompletionChoice _$ChatCompletionChoiceFromJson(
   Map<String, dynamic> json,
-) => _ChatCompletionChoice(
+) => ChatCompletionChoice(
   message: json['message'] == null
       ? null
       : ChatCompletionMessage.fromJson(json['message'] as Map<String, dynamic>),
 );
 
-_ChatCompletionMessage _$ChatCompletionMessageFromJson(
+ChatCompletionMessage _$ChatCompletionMessageFromJson(
   Map<String, dynamic> json,
-) => _ChatCompletionMessage(content: json['content']);
+) => ChatCompletionMessage(content: json['content']);

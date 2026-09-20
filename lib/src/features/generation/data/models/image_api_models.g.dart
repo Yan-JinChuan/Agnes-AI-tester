@@ -6,9 +6,9 @@ part of 'image_api_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_ImageGenerationRequest _$ImageGenerationRequestFromJson(
+ImageGenerationRequest _$ImageGenerationRequestFromJson(
   Map<String, dynamic> json,
-) => _ImageGenerationRequest(
+) => ImageGenerationRequest(
   model: json['model'] as String,
   prompt: json['prompt'] as String,
   size: json['size'] as String,
@@ -16,9 +16,9 @@ _ImageGenerationRequest _$ImageGenerationRequestFromJson(
   extraBody: json['extra_body'] as Map<String, dynamic>?,
 );
 
-_ImageGenerationResponse _$ImageGenerationResponseFromJson(
+ImageGenerationResponse _$ImageGenerationResponseFromJson(
   Map<String, dynamic> json,
-) => _ImageGenerationResponse(
+) => ImageGenerationResponse(
   data:
       (json['data'] as List<dynamic>?)
           ?.map((e) => ImageData.fromJson(e as Map<String, dynamic>))
@@ -26,7 +26,7 @@ _ImageGenerationResponse _$ImageGenerationResponseFromJson(
       const [],
 );
 
-_ImageData _$ImageDataFromJson(Map<String, dynamic> json) => _ImageData(
+ImageData _$ImageDataFromJson(Map<String, dynamic> json) => ImageData(
   url: json['url'] as String?,
   base64Json: json['b64_json'] as String?,
 );

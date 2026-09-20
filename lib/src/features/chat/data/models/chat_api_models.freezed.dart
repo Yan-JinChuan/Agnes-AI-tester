@@ -94,11 +94,10 @@ extension ChatCompletionRequestPatterns on ChatCompletionRequest {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatCompletionRequest value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ChatCompletionRequest() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -116,11 +115,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatCompletionRequest value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionRequest():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -137,11 +135,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatCompletionRequest value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionRequest() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -158,10 +155,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String model,  List<ChatMessagePayload> messages)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ChatCompletionRequest() when $default != null:
-return $default(_that.model,_that.messages);case _:
+case _:
   return orElse();
 
 }
@@ -179,10 +175,9 @@ return $default(_that.model,_that.messages);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String model,  List<ChatMessagePayload> messages)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionRequest():
-return $default(_that.model,_that.messages);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,90 +194,13 @@ return $default(_that.model,_that.messages);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String model,  List<ChatMessagePayload> messages)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionRequest() when $default != null:
-return $default(_that.model,_that.messages);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ChatCompletionRequest extends ChatCompletionRequest {
-   _ChatCompletionRequest({required this.model, required  List<ChatMessagePayload> messages}): _messages = messages,super(model: model, messages: messages);
-  factory _ChatCompletionRequest.fromJson(Map<String, dynamic> json) => _$ChatCompletionRequestFromJson(json);
-
-@override final  String model;
- final  List<ChatMessagePayload> _messages;
-@override List<ChatMessagePayload> get messages {
-  if (_messages is EqualUnmodifiableListView) return _messages;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_messages);
-}
-
-
-/// Create a copy of ChatCompletionRequest
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ChatCompletionRequestCopyWith<_ChatCompletionRequest> get copyWith => __$ChatCompletionRequestCopyWithImpl<_ChatCompletionRequest>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatCompletionRequest&&(identical(other.model, model) || other.model == model)&&const DeepCollectionEquality().equals(other.messages, _messages));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,model,const DeepCollectionEquality().hash(_messages));
-}
-
-@override
-String toString() {
-    return 'ChatCompletionRequest(model: $model, messages: $messages)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ChatCompletionRequestCopyWith<$Res> implements $ChatCompletionRequestCopyWith<$Res> {
-  factory _$ChatCompletionRequestCopyWith(_ChatCompletionRequest value, $Res Function(_ChatCompletionRequest) _then) = __$ChatCompletionRequestCopyWithImpl;
-@override @useResult
-$Res call({
- String model, List<ChatMessagePayload> messages
-});
-
-
-
-
-}
-/// @nodoc
-class __$ChatCompletionRequestCopyWithImpl<$Res>
-    implements _$ChatCompletionRequestCopyWith<$Res> {
-  __$ChatCompletionRequestCopyWithImpl(this._self, this._then);
-
-  final _ChatCompletionRequest _self;
-  final $Res Function(_ChatCompletionRequest) _then;
-
-/// Create a copy of ChatCompletionRequest
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? model = null,Object? messages = null,}) {
-  return _then(_ChatCompletionRequest(
-model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
-as List<ChatMessagePayload>,
-  ));
-}
-
 
 }
 
@@ -368,11 +286,10 @@ extension ChatMessagePayloadPatterns on ChatMessagePayload {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatMessagePayload value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ChatMessagePayload() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -390,11 +307,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatMessagePayload value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatMessagePayload():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -411,11 +327,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatMessagePayload value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatMessagePayload() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -432,10 +347,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String role,  String content)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ChatMessagePayload() when $default != null:
-return $default(_that.role,_that.content);case _:
+case _:
   return orElse();
 
 }
@@ -453,10 +367,9 @@ return $default(_that.role,_that.content);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String role,  String content)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatMessagePayload():
-return $default(_that.role,_that.content);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -473,84 +386,13 @@ return $default(_that.role,_that.content);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String role,  String content)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatMessagePayload() when $default != null:
-return $default(_that.role,_that.content);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ChatMessagePayload extends ChatMessagePayload {
-   _ChatMessagePayload({required this.role, required this.content}): super(role: role, content: content);
-  factory _ChatMessagePayload.fromJson(Map<String, dynamic> json) => _$ChatMessagePayloadFromJson(json);
-
-@override final  String role;
-@override final  String content;
-
-/// Create a copy of ChatMessagePayload
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ChatMessagePayloadCopyWith<_ChatMessagePayload> get copyWith => __$ChatMessagePayloadCopyWithImpl<_ChatMessagePayload>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatMessagePayload&&(identical(other.role, role) || other.role == role)&&(identical(other.content, content) || other.content == content));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,role,content);
-}
-
-@override
-String toString() {
-    return 'ChatMessagePayload(role: $role, content: $content)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ChatMessagePayloadCopyWith<$Res> implements $ChatMessagePayloadCopyWith<$Res> {
-  factory _$ChatMessagePayloadCopyWith(_ChatMessagePayload value, $Res Function(_ChatMessagePayload) _then) = __$ChatMessagePayloadCopyWithImpl;
-@override @useResult
-$Res call({
- String role, String content
-});
-
-
-
-
-}
-/// @nodoc
-class __$ChatMessagePayloadCopyWithImpl<$Res>
-    implements _$ChatMessagePayloadCopyWith<$Res> {
-  __$ChatMessagePayloadCopyWithImpl(this._self, this._then);
-
-  final _ChatMessagePayload _self;
-  final $Res Function(_ChatMessagePayload) _then;
-
-/// Create a copy of ChatMessagePayload
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? role = null,Object? content = null,}) {
-  return _then(_ChatMessagePayload(
-role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as String,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
 
 }
 
@@ -635,11 +477,10 @@ extension ChatCompletionResponsePatterns on ChatCompletionResponse {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatCompletionResponse value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ChatCompletionResponse() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -657,11 +498,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatCompletionResponse value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionResponse():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -678,11 +518,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatCompletionResponse value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionResponse() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -699,10 +538,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ChatCompletionChoice> choices)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ChatCompletionResponse() when $default != null:
-return $default(_that.choices);case _:
+case _:
   return orElse();
 
 }
@@ -720,10 +558,9 @@ return $default(_that.choices);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ChatCompletionChoice> choices)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionResponse():
-return $default(_that.choices);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -740,88 +577,13 @@ return $default(_that.choices);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ChatCompletionChoice> choices)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionResponse() when $default != null:
-return $default(_that.choices);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ChatCompletionResponse extends ChatCompletionResponse {
-   _ChatCompletionResponse({ List<ChatCompletionChoice> choices = const []}): _choices = choices,super(choices: choices);
-  factory _ChatCompletionResponse.fromJson(Map<String, dynamic> json) => _$ChatCompletionResponseFromJson(json);
-
- final  List<ChatCompletionChoice> _choices;
-@override List<ChatCompletionChoice> get choices {
-  if (_choices is EqualUnmodifiableListView) return _choices;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_choices);
-}
-
-
-/// Create a copy of ChatCompletionResponse
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ChatCompletionResponseCopyWith<_ChatCompletionResponse> get copyWith => __$ChatCompletionResponseCopyWithImpl<_ChatCompletionResponse>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatCompletionResponse&&const DeepCollectionEquality().equals(other.choices, _choices));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_choices));
-}
-
-@override
-String toString() {
-    return 'ChatCompletionResponse(choices: $choices)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ChatCompletionResponseCopyWith<$Res> implements $ChatCompletionResponseCopyWith<$Res> {
-  factory _$ChatCompletionResponseCopyWith(_ChatCompletionResponse value, $Res Function(_ChatCompletionResponse) _then) = __$ChatCompletionResponseCopyWithImpl;
-@override @useResult
-$Res call({
- List<ChatCompletionChoice> choices
-});
-
-
-
-
-}
-/// @nodoc
-class __$ChatCompletionResponseCopyWithImpl<$Res>
-    implements _$ChatCompletionResponseCopyWith<$Res> {
-  __$ChatCompletionResponseCopyWithImpl(this._self, this._then);
-
-  final _ChatCompletionResponse _self;
-  final $Res Function(_ChatCompletionResponse) _then;
-
-/// Create a copy of ChatCompletionResponse
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? choices = null,}) {
-  return _then(_ChatCompletionResponse(
-choices: null == choices ? _self._choices : choices // ignore: cast_nullable_to_non_nullable
-as List<ChatCompletionChoice>,
-  ));
-}
-
 
 }
 
@@ -918,11 +680,10 @@ extension ChatCompletionChoicePatterns on ChatCompletionChoice {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatCompletionChoice value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ChatCompletionChoice() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -940,11 +701,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatCompletionChoice value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionChoice():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -961,11 +721,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatCompletionChoice value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionChoice() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -982,10 +741,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ChatCompletionMessage? message)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ChatCompletionChoice() when $default != null:
-return $default(_that.message);case _:
+case _:
   return orElse();
 
 }
@@ -1003,10 +761,9 @@ return $default(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ChatCompletionMessage? message)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionChoice():
-return $default(_that.message);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1023,95 +780,14 @@ return $default(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ChatCompletionMessage? message)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionChoice() when $default != null:
-return $default(_that.message);case _:
+case _:
   return null;
 
 }
 }
 
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ChatCompletionChoice extends ChatCompletionChoice {
-   _ChatCompletionChoice({this.message}): super(message: message);
-  factory _ChatCompletionChoice.fromJson(Map<String, dynamic> json) => _$ChatCompletionChoiceFromJson(json);
-
-@override final  ChatCompletionMessage? message;
-
-/// Create a copy of ChatCompletionChoice
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ChatCompletionChoiceCopyWith<_ChatCompletionChoice> get copyWith => __$ChatCompletionChoiceCopyWithImpl<_ChatCompletionChoice>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatCompletionChoice&&(identical(other.message, message) || other.message == message));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,message);
-}
-
-@override
-String toString() {
-    return 'ChatCompletionChoice(message: $message)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ChatCompletionChoiceCopyWith<$Res> implements $ChatCompletionChoiceCopyWith<$Res> {
-  factory _$ChatCompletionChoiceCopyWith(_ChatCompletionChoice value, $Res Function(_ChatCompletionChoice) _then) = __$ChatCompletionChoiceCopyWithImpl;
-@override @useResult
-$Res call({
- ChatCompletionMessage? message
-});
-
-
-@override $ChatCompletionMessageCopyWith<$Res>? get message;
-
-}
-/// @nodoc
-class __$ChatCompletionChoiceCopyWithImpl<$Res>
-    implements _$ChatCompletionChoiceCopyWith<$Res> {
-  __$ChatCompletionChoiceCopyWithImpl(this._self, this._then);
-
-  final _ChatCompletionChoice _self;
-  final $Res Function(_ChatCompletionChoice) _then;
-
-/// Create a copy of ChatCompletionChoice
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,}) {
-  return _then(_ChatCompletionChoice(
-message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as ChatCompletionMessage?,
-  ));
-}
-
-/// Create a copy of ChatCompletionChoice
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$ChatCompletionMessageCopyWith<$Res>? get message {
-    if (_self.message == null) {
-    return null;
-  }
-
-  return $ChatCompletionMessageCopyWith<$Res>(_self.message!, (value) {
-    return _then(_self.copyWith(message: value));
-  });
-}
 }
 
 
@@ -1194,11 +870,10 @@ extension ChatCompletionMessagePatterns on ChatCompletionMessage {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ChatCompletionMessage value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ChatCompletionMessage() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -1216,11 +891,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ChatCompletionMessage value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionMessage():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1237,11 +911,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ChatCompletionMessage value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ChatCompletionMessage() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -1258,10 +931,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Object? content)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ChatCompletionMessage() when $default != null:
-return $default(_that.content);case _:
+case _:
   return orElse();
 
 }
@@ -1279,10 +951,9 @@ return $default(_that.content);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Object? content)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionMessage():
-return $default(_that.content);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1299,81 +970,13 @@ return $default(_that.content);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Object? content)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ChatCompletionMessage() when $default != null:
-return $default(_that.content);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ChatCompletionMessage extends ChatCompletionMessage {
-   _ChatCompletionMessage({this.content}): super(content: content);
-  factory _ChatCompletionMessage.fromJson(Map<String, dynamic> json) => _$ChatCompletionMessageFromJson(json);
-
-@override final  Object? content;
-
-/// Create a copy of ChatCompletionMessage
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ChatCompletionMessageCopyWith<_ChatCompletionMessage> get copyWith => __$ChatCompletionMessageCopyWithImpl<_ChatCompletionMessage>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChatCompletionMessage&&const DeepCollectionEquality().equals(other.content, content));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(content));
-}
-
-@override
-String toString() {
-    return 'ChatCompletionMessage(content: $content)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ChatCompletionMessageCopyWith<$Res> implements $ChatCompletionMessageCopyWith<$Res> {
-  factory _$ChatCompletionMessageCopyWith(_ChatCompletionMessage value, $Res Function(_ChatCompletionMessage) _then) = __$ChatCompletionMessageCopyWithImpl;
-@override @useResult
-$Res call({
- Object? content
-});
-
-
-
-
-}
-/// @nodoc
-class __$ChatCompletionMessageCopyWithImpl<$Res>
-    implements _$ChatCompletionMessageCopyWith<$Res> {
-  __$ChatCompletionMessageCopyWithImpl(this._self, this._then);
-
-  final _ChatCompletionMessage _self;
-  final $Res Function(_ChatCompletionMessage) _then;
-
-/// Create a copy of ChatCompletionMessage
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? content = freezed,}) {
-  return _then(_ChatCompletionMessage(
-content: freezed == content ? _self.content : content ,
-  ));
-}
-
 
 }
 

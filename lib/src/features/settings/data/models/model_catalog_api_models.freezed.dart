@@ -94,11 +94,10 @@ extension ModelCatalogResponsePatterns on ModelCatalogResponse {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ModelCatalogResponse value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ModelCatalogResponse() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -116,11 +115,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ModelCatalogResponse value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ModelCatalogResponse():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -137,11 +135,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ModelCatalogResponse value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ModelCatalogResponse() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -158,10 +155,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Object?>? data,  List<Object?>? models)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ModelCatalogResponse() when $default != null:
-return $default(_that.data,_that.models);case _:
+case _:
   return orElse();
 
 }
@@ -179,10 +175,9 @@ return $default(_that.data,_that.models);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Object?>? data,  List<Object?>? models)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ModelCatalogResponse():
-return $default(_that.data,_that.models);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,100 +194,13 @@ return $default(_that.data,_that.models);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Object?>? data,  List<Object?>? models)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ModelCatalogResponse() when $default != null:
-return $default(_that.data,_that.models);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ModelCatalogResponse extends ModelCatalogResponse {
-  const _ModelCatalogResponse({ List<Object?>? data,  List<Object?>? models}): _data = data,_models = models,super(data: data, models: models);
-  factory _ModelCatalogResponse.fromJson(Map<String, dynamic> json) => _$ModelCatalogResponseFromJson(json);
-
- final  List<Object?>? _data;
-@override List<Object?>? get data {
-  final value = _data;
-  if (value == null) return null;
-  if (_data is EqualUnmodifiableListView) return _data;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
-}
-
- final  List<Object?>? _models;
-@override List<Object?>? get models {
-  final value = _models;
-  if (value == null) return null;
-  if (_models is EqualUnmodifiableListView) return _models;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
-}
-
-
-/// Create a copy of ModelCatalogResponse
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ModelCatalogResponseCopyWith<_ModelCatalogResponse> get copyWith => __$ModelCatalogResponseCopyWithImpl<_ModelCatalogResponse>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ModelCatalogResponse&&const DeepCollectionEquality().equals(other.data, _data)&&const DeepCollectionEquality().equals(other.models, _models));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_data),const DeepCollectionEquality().hash(_models));
-}
-
-@override
-String toString() {
-    return 'ModelCatalogResponse(data: $data, models: $models)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ModelCatalogResponseCopyWith<$Res> implements $ModelCatalogResponseCopyWith<$Res> {
-  factory _$ModelCatalogResponseCopyWith(_ModelCatalogResponse value, $Res Function(_ModelCatalogResponse) _then) = __$ModelCatalogResponseCopyWithImpl;
-@override @useResult
-$Res call({
- List<Object?>? data, List<Object?>? models
-});
-
-
-
-
-}
-/// @nodoc
-class __$ModelCatalogResponseCopyWithImpl<$Res>
-    implements _$ModelCatalogResponseCopyWith<$Res> {
-  __$ModelCatalogResponseCopyWithImpl(this._self, this._then);
-
-  final _ModelCatalogResponse _self;
-  final $Res Function(_ModelCatalogResponse) _then;
-
-/// Create a copy of ModelCatalogResponse
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? data = freezed,Object? models = freezed,}) {
-  return _then(_ModelCatalogResponse(
-data: freezed == data ? _self._data : data // ignore: cast_nullable_to_non_nullable
-as List<Object?>?,models: freezed == models ? _self._models : models // ignore: cast_nullable_to_non_nullable
-as List<Object?>?,
-  ));
-}
-
 
 }
 

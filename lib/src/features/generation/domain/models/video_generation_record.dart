@@ -1,5 +1,6 @@
 import 'video_generation_options.dart';
 import 'video_job.dart';
+import 'video_job_status.dart';
 
 class VideoGenerationRecord {
   const VideoGenerationRecord({
@@ -24,7 +25,7 @@ class VideoGenerationRecord {
   final String prompt;
   final String model;
   final VideoGenerationOptions options;
-  final String status;
+  final VideoJobStatus status;
   final int progress;
   final String? url;
   final String? error;

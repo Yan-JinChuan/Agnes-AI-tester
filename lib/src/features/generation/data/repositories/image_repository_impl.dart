@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 
 import '../../../../core/cache/app_media_cache.dart';
+import '../../../../core/network/api_exception.dart';
 import '../../domain/models/image_generation_record.dart';
 import '../../domain/models/image_generation_result.dart';
 import '../../domain/repositories/image_repository.dart';
 import '../datasources/image_local_data_source.dart';
 import '../datasources/image_remote_data_source.dart';
+import '../models/image_api_models.dart';
 
 class ImageRepositoryImpl implements ImageRepository {
   const ImageRepositoryImpl({
@@ -31,11 +33,19 @@ class ImageRepositoryImpl implements ImageRepository {
     required String prompt,
     required String size,
   }) async {
-    final result = await remote.generate(
-      model: model,
-      prompt: prompt,
-      size: size,
+    final response = await remote.generate(
+      request: ImageGenerationRequest(
+        model: model,
+        prompt: prompt,
+        size: size,
+        extraBody: const {'response_format': 'url'},
+      ),
     );
+    final first = response.data.isEmpty ? null : response.data.first;
+    if (first == null) {
+      throw const ApiException(message: '接口没有返回图片数据。');
+    }
+    final result = _toDomain(first);
     await _cacheResult(result, prompt);
     final record = ImageGenerationRecord(
       prompt: prompt,
@@ -46,6 +56,14 @@ class ImageRepositoryImpl implements ImageRepository {
     );
     final id = await local.insertGeneration(_toRow(record));
     return record.copyWith(id: id);
+  }
+
+  ImageGenerationResult _toDomain(ImageData data) {
+    try {
+      return data.toDomain();
+    } on FormatException catch (error) {
+      throw ApiException(message: error.message);
+    }
   }
 
   Future<void> _cacheResult(ImageGenerationResult result, String prompt) async {

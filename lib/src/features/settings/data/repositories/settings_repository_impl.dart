@@ -8,5 +8,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
   final ModelCatalogRemoteDataSource remote;
 
   @override
-  Future<List<ModelInfo>> fetchModels() => remote.fetchModels();
+  Future<List<ModelInfo>> fetchModels() async {
+    final response = await remote.fetchModels();
+    return response.toDomain();
+  }
 }

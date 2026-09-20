@@ -1,8 +1,10 @@
+import '../../../../core/network/api_exception.dart';
 import '../../domain/models/chat_message.dart';
 import '../../domain/models/conversation_summary.dart';
 import '../../domain/repositories/chat_repository.dart';
 import '../datasources/chat_local_data_source.dart';
 import '../datasources/chat_remote_data_source.dart';
+import '../models/chat_api_models.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
   const ChatRepositoryImpl({
@@ -56,8 +58,18 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<String> completeChat(List<ChatMessage> messages) {
-    return remote.completeChat(model: model, messages: messages);
+  Future<String> completeChat(List<ChatMessage> messages) async {
+    final response = await remote.completeChat(
+      request: ChatCompletionRequest.fromDomain(
+        model: model,
+        messages: messages,
+      ),
+    );
+    final content = response.textContent;
+    if (content == null) {
+      throw const ApiException(message: '接口返回成功，但回复内容为空。');
+    }
+    return content;
   }
 
   ChatMessage _messageFromRow(Map<String, Object?> row) {

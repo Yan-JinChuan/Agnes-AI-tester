@@ -307,7 +307,7 @@ AppConfigDao(core/storage) -> AppConfig persistence (existing exception)
 Remote/Local DataSource -> data/repositories Repository 实现 -> data/di Repository Provider -> Domain Repository
 ```
 
-其中 `DioApiClient` 只负责 Base URL、超时、鉴权、日志和 `DioException` 归一化，不能依赖任何 feature 类型；Retrofit API 不应被 ViewModel 直接调用；RemoteDataSource 负责 DTO 与领域模型之间的转换，以及对 OpenAI 兼容字段的兼容处理。
+其中 `DioApiClient` 只负责 Base URL、超时、鉴权、日志和 `DioException` 归一化，不能依赖任何 feature 类型；Retrofit API 不应被 ViewModel 直接调用；RemoteDataSource 只负责 HTTP 调用和 JSON 到 DTO 的还原，不得导入 Domain 模型。DTO 可以提供 `toDomain()` / `fromDomain()` 辅助方法，但必须由 RepositoryImpl 调用，RepositoryImpl 负责 DTO 与领域模型之间的转换、远程与本地数据协调，以及对 OpenAI 兼容字段的业务组装。
 
 推荐结构：
 
@@ -360,7 +360,7 @@ Dio dio(Ref ref) {
 - Base URL、超时、默认 headers 和环境变量集中配置；生产环境不把 token/密钥写死在源码。
 - Logging 只在 debug 或经过脱敏后启用，禁止输出 Authorization、密码和个人敏感数据。
 - Interceptor 负责 token 注入、刷新、日志和把 `DioException` 归一化；不要在 Widget 捕获 Dio 异常。
-- Retrofit API 可以暴露类型化的 `Future<T>` endpoint，但 Repository 必须通过 RemoteDataSource 完成 DTO 到 Domain 的转换，不能把 `Response`、DTO 或 JSON Map 传给 ViewModel。
+- Retrofit API 可以暴露类型化的 `Future<T>` endpoint，但 RemoteDataSource 只能返回 DTO；Repository 必须完成 DTO 到 Domain 的转换，不能把 `Response`、DTO 或 JSON Map 传给 ViewModel。DTO 中的 `toDomain()` / `fromDomain()` 只能作为 RepositoryImpl 的映射辅助方法，不能让 RemoteDataSource 直接产出 Domain。
 - 统一映射连接超时、无网络、取消、401/403、404、业务错误和 5xx；保留原始 cause/stack，给 UI 暴露可读的 AppException。
 - 写操作支持取消、幂等键（需要时）、重试白名单和分页；不要自动重试非幂等请求。
 - Dio Provider、ApiClient 和 Repository 都要能通过 `ProviderScope` override 或构造函数注入替换。

@@ -1,10 +1,14 @@
 import 'dart:convert';
 
+import '../../../../core/network/api_exception.dart';
 import '../../domain/models/video_generation_options.dart';
 import '../../domain/models/video_generation_record.dart';
+import '../../domain/models/video_job.dart';
+import '../../domain/models/video_job_status.dart';
 import '../../domain/repositories/video_repository.dart';
 import '../datasources/video_local_data_source.dart';
 import '../datasources/video_remote_data_source.dart';
+import '../models/video_api_models.dart';
 
 class VideoRepositoryImpl implements VideoRepository {
   const VideoRepositoryImpl({
@@ -28,7 +32,14 @@ class VideoRepositoryImpl implements VideoRepository {
     required String prompt,
     required VideoGenerationOptions options,
   }) async {
-    final job = await remote.create(prompt: prompt, options: options);
+    final response = await remote.create(
+      request: VideoCreateRequest.fromDomain(
+        model: model,
+        prompt: prompt,
+        options: options,
+      ),
+    );
+    final job = _toDomain(response);
     final now = DateTime.now();
     final record = VideoGenerationRecord(
       videoId: job.id,
@@ -52,7 +63,10 @@ class VideoRepositoryImpl implements VideoRepository {
   @override
   Future<VideoGenerationRecord> poll({required String videoId}) async {
     final existingRow = await local.findByVideoId(videoId);
-    final job = await remote.poll(videoId: videoId);
+    final job = _toDomain(
+      await remote.poll(videoId: videoId),
+      fallbackId: videoId,
+    );
     final record = existingRow == null
         ? VideoGenerationRecord(
             videoId: job.id,
@@ -77,6 +91,14 @@ class VideoRepositoryImpl implements VideoRepository {
     return record;
   }
 
+  VideoJob _toDomain(VideoJobResponse response, {String? fallbackId}) {
+    try {
+      return response.toDomain(fallbackId: fallbackId);
+    } on FormatException catch (error) {
+      throw ApiException(message: error.message);
+    }
+  }
+
   VideoGenerationRecord _fromRow(Map<String, Object?> row) {
     return VideoGenerationRecord(
       id: row['id'] as int?,
@@ -84,7 +106,7 @@ class VideoRepositoryImpl implements VideoRepository {
       prompt: row['prompt'] as String? ?? '',
       model: row['model'] as String? ?? '',
       options: _optionsFromStorage(row['request_json'] as String?),
-      status: row['status'] as String? ?? 'queued',
+      status: VideoJobStatus.fromWireValue(row['status']),
       progress: (row['progress'] as int? ?? 0).clamp(0, 100),
       url: (row['url'] as String?)?.trim(),
       error: (row['error'] as String?)?.trim(),
@@ -102,7 +124,7 @@ class VideoRepositoryImpl implements VideoRepository {
       'prompt': record.prompt,
       'model': record.model,
       'request_json': jsonEncode(_optionsToStorage(record.options)),
-      'status': record.status,
+      'status': record.status.wireValue,
       'progress': record.progress,
       'url': record.url,
       'error': record.error,

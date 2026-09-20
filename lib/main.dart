@@ -17,7 +17,9 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         appDatabaseProvider.overrideWithValue(db),
-        appConfigProvider.overrideWithValue(initialConfig),
+        appConfigProvider.overrideWith(
+          () => AppConfigNotifier(initialConfig: initialConfig),
+        ),
       ],
       child: const AgnesApp(),
     ),

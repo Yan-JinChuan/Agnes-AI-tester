@@ -97,11 +97,10 @@ extension ImageGenerationRequestPatterns on ImageGenerationRequest {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ImageGenerationRequest value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ImageGenerationRequest() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -119,11 +118,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ImageGenerationRequest value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ImageGenerationRequest():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -140,11 +138,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ImageGenerationRequest value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ImageGenerationRequest() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -161,10 +158,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String model,  String prompt,  String size,  int n, @JsonKey(name: 'extra_body')  Map<String, dynamic>? extraBody)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ImageGenerationRequest() when $default != null:
-return $default(_that.model,_that.prompt,_that.size,_that.n,_that.extraBody);case _:
+case _:
   return orElse();
 
 }
@@ -182,10 +178,9 @@ return $default(_that.model,_that.prompt,_that.size,_that.n,_that.extraBody);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String model,  String prompt,  String size,  int n, @JsonKey(name: 'extra_body')  Map<String, dynamic>? extraBody)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ImageGenerationRequest():
-return $default(_that.model,_that.prompt,_that.size,_that.n,_that.extraBody);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,98 +197,13 @@ return $default(_that.model,_that.prompt,_that.size,_that.n,_that.extraBody);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String model,  String prompt,  String size,  int n, @JsonKey(name: 'extra_body')  Map<String, dynamic>? extraBody)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ImageGenerationRequest() when $default != null:
-return $default(_that.model,_that.prompt,_that.size,_that.n,_that.extraBody);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ImageGenerationRequest extends ImageGenerationRequest {
-   _ImageGenerationRequest({required this.model, required this.prompt, required this.size, this.n = 1, @JsonKey(name: 'extra_body')  Map<String, dynamic>? extraBody}): _extraBody = extraBody,super(model: model, prompt: prompt, size: size, n: n, extraBody: extraBody);
-  factory _ImageGenerationRequest.fromJson(Map<String, dynamic> json) => _$ImageGenerationRequestFromJson(json);
-
-@override final  String model;
-@override final  String prompt;
-@override final  String size;
-@override final  int n;
- final  Map<String, dynamic>? _extraBody;
-@override@JsonKey(name: 'extra_body') Map<String, dynamic>? get extraBody {
-  final value = _extraBody;
-  if (value == null) return null;
-  if (_extraBody is EqualUnmodifiableMapView) return _extraBody;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(value);
-}
-
-
-/// Create a copy of ImageGenerationRequest
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ImageGenerationRequestCopyWith<_ImageGenerationRequest> get copyWith => __$ImageGenerationRequestCopyWithImpl<_ImageGenerationRequest>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ImageGenerationRequest&&(identical(other.model, model) || other.model == model)&&(identical(other.prompt, prompt) || other.prompt == prompt)&&(identical(other.size, size) || other.size == size)&&(identical(other.n, n) || other.n == n)&&const DeepCollectionEquality().equals(other.extraBody, _extraBody));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,model,prompt,size,n,const DeepCollectionEquality().hash(_extraBody));
-}
-
-@override
-String toString() {
-    return 'ImageGenerationRequest(model: $model, prompt: $prompt, size: $size, n: $n, extraBody: $extraBody)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ImageGenerationRequestCopyWith<$Res> implements $ImageGenerationRequestCopyWith<$Res> {
-  factory _$ImageGenerationRequestCopyWith(_ImageGenerationRequest value, $Res Function(_ImageGenerationRequest) _then) = __$ImageGenerationRequestCopyWithImpl;
-@override @useResult
-$Res call({
- String model, String prompt, String size, int n,@JsonKey(name: 'extra_body') Map<String, dynamic>? extraBody
-});
-
-
-
-
-}
-/// @nodoc
-class __$ImageGenerationRequestCopyWithImpl<$Res>
-    implements _$ImageGenerationRequestCopyWith<$Res> {
-  __$ImageGenerationRequestCopyWithImpl(this._self, this._then);
-
-  final _ImageGenerationRequest _self;
-  final $Res Function(_ImageGenerationRequest) _then;
-
-/// Create a copy of ImageGenerationRequest
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? model = null,Object? prompt = null,Object? size = null,Object? n = null,Object? extraBody = freezed,}) {
-  return _then(_ImageGenerationRequest(
-model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,prompt: null == prompt ? _self.prompt : prompt // ignore: cast_nullable_to_non_nullable
-as String,size: null == size ? _self.size : size // ignore: cast_nullable_to_non_nullable
-as String,n: null == n ? _self.n : n // ignore: cast_nullable_to_non_nullable
-as int,extraBody: freezed == extraBody ? _self._extraBody : extraBody // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>?,
-  ));
-}
-
 
 }
 
@@ -378,11 +288,10 @@ extension ImageGenerationResponsePatterns on ImageGenerationResponse {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ImageGenerationResponse value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ImageGenerationResponse() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -400,11 +309,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ImageGenerationResponse value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ImageGenerationResponse():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -421,11 +329,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ImageGenerationResponse value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ImageGenerationResponse() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -442,10 +349,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ImageData> data)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ImageGenerationResponse() when $default != null:
-return $default(_that.data);case _:
+case _:
   return orElse();
 
 }
@@ -463,10 +369,9 @@ return $default(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ImageData> data)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ImageGenerationResponse():
-return $default(_that.data);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -483,88 +388,13 @@ return $default(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ImageData> data)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ImageGenerationResponse() when $default != null:
-return $default(_that.data);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ImageGenerationResponse extends ImageGenerationResponse {
-   _ImageGenerationResponse({ List<ImageData> data = const []}): _data = data,super(data: data);
-  factory _ImageGenerationResponse.fromJson(Map<String, dynamic> json) => _$ImageGenerationResponseFromJson(json);
-
- final  List<ImageData> _data;
-@override List<ImageData> get data {
-  if (_data is EqualUnmodifiableListView) return _data;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_data);
-}
-
-
-/// Create a copy of ImageGenerationResponse
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ImageGenerationResponseCopyWith<_ImageGenerationResponse> get copyWith => __$ImageGenerationResponseCopyWithImpl<_ImageGenerationResponse>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ImageGenerationResponse&&const DeepCollectionEquality().equals(other.data, _data));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_data));
-}
-
-@override
-String toString() {
-    return 'ImageGenerationResponse(data: $data)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ImageGenerationResponseCopyWith<$Res> implements $ImageGenerationResponseCopyWith<$Res> {
-  factory _$ImageGenerationResponseCopyWith(_ImageGenerationResponse value, $Res Function(_ImageGenerationResponse) _then) = __$ImageGenerationResponseCopyWithImpl;
-@override @useResult
-$Res call({
- List<ImageData> data
-});
-
-
-
-
-}
-/// @nodoc
-class __$ImageGenerationResponseCopyWithImpl<$Res>
-    implements _$ImageGenerationResponseCopyWith<$Res> {
-  __$ImageGenerationResponseCopyWithImpl(this._self, this._then);
-
-  final _ImageGenerationResponse _self;
-  final $Res Function(_ImageGenerationResponse) _then;
-
-/// Create a copy of ImageGenerationResponse
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? data = null,}) {
-  return _then(_ImageGenerationResponse(
-data: null == data ? _self._data : data // ignore: cast_nullable_to_non_nullable
-as List<ImageData>,
-  ));
-}
-
 
 }
 
@@ -650,11 +480,10 @@ extension ImageDataPatterns on ImageData {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ImageData value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ImageData() when $default != null:
-return $default(_that);case _:
+case _:
   return orElse();
 
 }
@@ -672,11 +501,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ImageData value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ImageData():
-return $default(_that);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -693,11 +521,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ImageData value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
 final _that = this;
 switch (_that) {
-case _ImageData() when $default != null:
-return $default(_that);case _:
+case _:
   return null;
 
 }
@@ -714,10 +541,9 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? url, @JsonKey(name: 'b64_json')  String? base64Json)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ImageData() when $default != null:
-return $default(_that.url,_that.base64Json);case _:
+case _:
   return orElse();
 
 }
@@ -735,10 +561,9 @@ return $default(_that.url,_that.base64Json);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? url, @JsonKey(name: 'b64_json')  String? base64Json)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ImageData():
-return $default(_that.url,_that.base64Json);case _:
+case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -755,84 +580,13 @@ return $default(_that.url,_that.base64Json);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? url, @JsonKey(name: 'b64_json')  String? base64Json)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
 switch (_that) {
-case _ImageData() when $default != null:
-return $default(_that.url,_that.base64Json);case _:
+case _:
   return null;
 
 }
 }
-
-}
-
-/// @nodoc
-@JsonSerializable(createToJson: false)
-
-class _ImageData extends ImageData {
-   _ImageData({this.url, @JsonKey(name: 'b64_json') this.base64Json}): super(url: url, base64Json: base64Json);
-  factory _ImageData.fromJson(Map<String, dynamic> json) => _$ImageDataFromJson(json);
-
-@override final  String? url;
-@override@JsonKey(name: 'b64_json') final  String? base64Json;
-
-/// Create a copy of ImageData
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ImageDataCopyWith<_ImageData> get copyWith => __$ImageDataCopyWithImpl<_ImageData>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ImageData&&(identical(other.url, url) || other.url == url)&&(identical(other.base64Json, base64Json) || other.base64Json == base64Json));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode {
-    return Object.hash(runtimeType,url,base64Json);
-}
-
-@override
-String toString() {
-    return 'ImageData(url: $url, base64Json: $base64Json)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ImageDataCopyWith<$Res> implements $ImageDataCopyWith<$Res> {
-  factory _$ImageDataCopyWith(_ImageData value, $Res Function(_ImageData) _then) = __$ImageDataCopyWithImpl;
-@override @useResult
-$Res call({
- String? url,@JsonKey(name: 'b64_json') String? base64Json
-});
-
-
-
-
-}
-/// @nodoc
-class __$ImageDataCopyWithImpl<$Res>
-    implements _$ImageDataCopyWith<$Res> {
-  __$ImageDataCopyWithImpl(this._self, this._then);
-
-  final _ImageData _self;
-  final $Res Function(_ImageData) _then;
-
-/// Create a copy of ImageData
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? url = freezed,Object? base64Json = freezed,}) {
-  return _then(_ImageData(
-url: freezed == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
-as String?,base64Json: freezed == base64Json ? _self.base64Json : base64Json // ignore: cast_nullable_to_non_nullable
-as String?,
-  ));
-}
-
 
 }
 

@@ -1,37 +1,18 @@
-class VideoJob {
-  const VideoJob({
-    required this.id,
-    required this.status,
-    required this.progress,
-    this.url,
-    this.error,
-    this.actualSize,
-    this.seconds,
-    this.metadataMessage,
-  });
+import 'video_job_status.dart';
 
-  final String id;
-  final String status;
-  final int progress;
-  final String? url;
-  final String? error;
-  final String? actualSize;
-  final double? seconds;
-  final String? metadataMessage;
+class VideoJob({
+  required final String id,
+  required final VideoJobStatus status,
+  required final int progress,
+  final String? url,
+  final String? error,
+  final String? actualSize,
+  final double? seconds,
+  final String? metadataMessage,
+}) {
+  bool get isCompleted => status.isCompleted;
 
-  bool get isCompleted => {
-    'completed',
-    'succeeded',
-    'success',
-    'done',
-  }.contains(status.toLowerCase());
+  bool get isFailed => status.isFailed;
 
-  bool get isFailed => {
-    'failed',
-    'error',
-    'cancelled',
-    'canceled',
-  }.contains(status.toLowerCase());
-
-  bool get isRunning => !isCompleted && !isFailed;
+  bool get isRunning => status.isRunning;
 }
