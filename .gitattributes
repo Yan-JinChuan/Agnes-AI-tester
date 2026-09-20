@@ -1,0 +1,18 @@
+# 1. 统一全平台换行符为 LF，避免 Windows/Mac 协作冲突
+* text=auto eol=lf
+
+# 2. Windows 专属批处理脚本保留 CRLF
+*.bat text eol=crlf
+
+# 3. 告诉 GitHub/GitLab：这是代码生成文件，请在 PR 中自动折叠、排除统计
+*.g.dart linguist-generated=true
+*.freezed.dart linguist-generated=true
+
+# 4. 明确将媒体文件与数据库标记为二进制文件，防止 Git 尝试进行文本差异比对
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.db binary
+*.sqlite binary
+*.mp4 binary
