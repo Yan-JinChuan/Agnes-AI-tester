@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/cache/app_media_cache.dart';
 import '../../../../core/config/app_config_provider.dart';
 import '../../domain/models/video_generation_options.dart';
 import '../viewmodels/video_generation_view_model.dart';
@@ -40,7 +39,6 @@ class _VideoGenerationViewState extends ConsumerState<VideoGenerationView> {
   Widget build(BuildContext context) {
     final state = ref.watch(videoGenerationViewModelProvider);
     final config = ref.watch(appConfigProvider);
-    final cache = ref.watch(appMediaCacheProvider);
     final viewModel = ref.read(videoGenerationViewModelProvider.notifier);
     final currentRecord = state.currentRecord;
     final isModern = isAgnesVideo25OrLater(config.videoModel);
@@ -139,7 +137,6 @@ class _VideoGenerationViewState extends ConsumerState<VideoGenerationView> {
                   const SizedBox(height: 24),
                   VideoJobCard(
                     record: currentRecord,
-                    cache: cache,
                     isLoading: state.isLoading,
                     onPoll: viewModel.poll,
                   ),

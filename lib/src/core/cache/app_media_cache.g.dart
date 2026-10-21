@@ -21,7 +21,7 @@ final class AppMediaCacheProvider
         argument: null,
         retry: null,
         name: r'appMediaCacheProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,4 +48,4 @@ final class AppMediaCacheProvider
   }
 }
 
-String _$appMediaCacheHash() => r'0fff5db8d4e1b155059362ef770fb5e7ddf84bc3';
+String _$appMediaCacheHash() => r'1a3fc6dbc3eab85e07cb6b7547190d6f5e183ecd';

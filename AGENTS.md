@@ -1,86 +1,84 @@
 # Agnes AI Tester 项目协作规范与 AI 编程指南
 
 > **CRITICAL NOTICE FOR AI CODING AGENTS**  
-> 本文件包含本项目的最高架构约束。AI 编程助手在生成、重构 Dart/Flutter 代码时必须严格遵守本文件中的所有规则。任何违反分层约束、在 ViewModel 中使用 `BuildContext` 或使用 Freezed 旧版语法的代码均属不合格交付。
+> 本文件包含本项目的最高架构约束。AI 编程助手在生成、重构 Dart/Flutter 代码时必须严格遵守本文件中的所有规则。任何违反分层约束、在 ViewModel 中使用 `BuildContext`、在 `shared` 中耦合业务代码或使用 Freezed 旧版语法的代码均属不合格交付。
 
 ---
 
 ## 1. 架构硬性红线（Strict Red Lines）
 
-| 严禁行为（STRICTLY FORBIDDEN ❌）                          | 正确规范（MUST FOLLOW ✅）                                                       |
-|:----------------------------------------------------|:--------------------------------------------------------------------------|
-| **在 ViewModel 中传入、持有或使用 `BuildContext`**            | ViewModel 必须与 UI 引擎解耦。页面跳转、弹窗、SnackBar、软键盘收起**必须由 View 自行持有 Context 执行**。 |
-| **在 ViewModel 中导入 `package:flutter/material.dart`** | ViewModel 必须是纯 Dart 逻辑，保持单测独立性。如需注解可导入 `meta` 或 `foundation`。             |
-| **View 跨层直接调用 Dio、SQLite 或 Repository**             | View 只能通过 `ref.watch` / `ref.read` 与当前特性的 **ViewModel** 交互。               |
-| **ViewModel 跨层直接调用 Dio、ApiClient 或 SQLite**         | ViewModel 只能面向 **Repository 抽象接口**编程，绝不能直连底层数据源。                          |
-| **使用 Freezed 旧版工厂构造函数写法**                           | **必须使用 Dart 3.13+ 原生主构造函数（Primary Constructor）** 定义不可变状态与模型。              |
-| **在 View 中使用 `Timer` 轮询视频/接口状态**                    | 轮询、重试与数据状态合并属于 **ViewModel / Repository** 的职责，View 只负责渲染状态。               |
-| **手动修改 `*.g.dart` 或 `*.freezed.dart` 文件**           | 严禁手工修改生成文件。必须修改注解源文件并通过 `build_runner` 重新构建。                              |
-| **在 State 中散落多个孤立的布尔变量**                            | 页面状态必须收敛为一个不可变的 Freezed State（如统一管理 `isLoading`、数据列表、`error`）。            |
+| 严禁行为（STRICTLY FORBIDDEN ❌）                          | 正确规范（MUST FOLLOW ✅）                                                                  |
+|:----------------------------------------------------|:-------------------------------------------------------------------------------------|
+| **在 ViewModel 中传入、持有或使用 `BuildContext`**            | ViewModel 必须与 UI 引擎解耦。页面跳转、弹窗、SnackBar、软键盘收起**必须由 View 自行持有 Context 执行**。            |
+| **在 ViewModel 中导入 `package:flutter/material.dart`** | ViewModel 必须是纯 Dart 逻辑，保持单测独立性。如需注解可导入 `meta` 或 `foundation`。                        |
+| **`shared/` 中导入或耦合任何 `features/` 代码**               | `shared/` 属于纯通用视觉资产，**严禁感知任何 Feature 业务概念**；全工程严格遵守 `features ➔ shared ➔ core` 单向依赖。 |
+| **在 `core/` 中编写具体的视觉 UI 控件**                        | `core/` 必须保持为纯技术基建底座（网络、数据库、代理、缓存引擎）；公共 UI 组件统一收敛至 `shared/widgets/`。                |
+| **View 跨层直接调用 Dio、SQLite 或 Repository**             | View 只能通过 `ref.watch` / `ref.read` 与当前特性的 **ViewModel** 交互。                          |
+| **ViewModel 跨层直接调用 Dio、ApiClient 或 SQLite**         | ViewModel 只能面向 **Repository 抽象接口**编程，绝不能直连底层数据源。                                     |
+| **使用 Freezed 旧版工厂构造函数写法**                           | **必须使用 Dart 3.13+ 原生主构造函数（Primary Constructor）** 定义不可变状态与模型。                         |
+| **在 View 中使用 `Timer` 轮询视频/接口状态**                    | 轮询、重试与数据状态合并属于 **ViewModel / Repository** 的职责，View 只负责渲染状态。                          |
+| **手动修改 `*.g.dart` 或 `*.freezed.dart` 文件**           | 严禁手工修改生成文件。必须修改注解源文件并通过 `build_runner` 重新构建。                                         |
+| **在 State 中散落多个孤立的布尔变量**                            | 页面状态必须收敛为一个不可变的 Freezed State（如统一管理 `isLoading`、数据列表、`error`）。                       |
+| **生成完全无注释充斥无意义废话的“裸奔代码”**                           | 公共类、核心方法必须包含 `///` 文档注释；复杂逻辑必须使用中文分步注释阐明**“为什么这么写（Why）”**而非解释语法。                     |
 
 ---
 
 ## 2. 目录分层与职责边界
 
-所有业务功能统一收敛在 `lib/src/features/<feature>/` 下（Feature-First）：
+工程骨架由 **`core`（技术底座）**、**`shared`（通用公共资产）** 与 **`features`（业务特性）** 构成：
 
 ```text
-features/<feature>/
-├── data/
-│   ├── datasources/         # Retrofit API、RemoteDataSource、LocalDataSource (SQLite)
-│   ├── models/              # DTO 网络模型 (Freezed + fromJson)
-│   ├── repositories/        # Repository 抽象接口的具体实现类 (*_impl.dart)
-│   └── di/                  # 本模块 Repository Provider 装配（组合根）
-├── domain/                  # 纯 Dart 业务核心（零 Flutter、Dio、SQLite 依赖）
-│   ├── models/              # 业务领域实体（Domain Entity）与业务枚举
-│   └── repositories/        # 仓库抽象契约接口 (abstract interface class)
-└── presentation/            # 表现层 (MVVM)
-    ├── viewmodels/          # Riverpod Notifier (ViewModel) 与不可变 State
-    ├── views/               # 页面级组件 (*View)：布局、Context 交互、路由跳转
-    ├── widgets/             # 功能内私有展示组件 (纯入参渲染，无数据源读取)
-    └── extensions/          # 表现层扩展：将 Domain 状态转换为 UI 文案、颜色
+lib/src/
+├── core/                            # 基础设施：纯技术底层驱动（零视觉 UI，零业务）
+│   ├── cache/                       # 媒体磁盘缓存管理、视频边下边播本地代理服务 (Proxy)
+│   ├── config/                      # 运行时全局配置 (AppConfig) 与常驻内存状态
+│   ├── network/                     # DioApiClient、全局拦截器、统一异常
+│   └── storage/                     # SQLite 底座工厂 (AppDatabase)、AppConfigDao
+│
+├── shared/                          # 跨功能共享层：零业务概念的通用视觉积木
+│   ├── theme/                       # 设计系统规范 (AppColors, AppTextStyles)
+│   └── widgets/                     # 通用 UI 组件 (按组件属性分类)
+│       ├── image/                   # 通用图片加载组件 (AppCachedImage)
+│       ├── video/                   # 通用视频播放器组件 (AppVideoPlayer)
+│       └── buttons/                 # 通用基础按钮 (AppLoadingButton)
+│
+└── features/<feature>/              # 业务特性模块 (Feature-First)
+    ├── data/
+    │   ├── datasources/             # Retrofit API、RemoteDataSource、LocalDataSource (SQLite)
+    │   ├── models/                  # DTO 网络模型 (Freezed + fromJson)
+    │   ├── repositories/            # Repository 抽象接口的具体实现类 (*_impl.dart)
+    │   └── di/                      # 模块装配组合根 (暴露 RepositoryProvider)
+    ├── domain/                      # 纯 Dart 业务核心 (零 Flutter、Dio、SQLite 依赖)
+    │   ├── models/                  # 业务领域实体 (Domain Entity) 与业务枚举
+    │   └── repositories/            # 仓库抽象契约接口 (abstract interface class)
+    └── presentation/                # 表现层 (MVVM)
+        ├── viewmodels/              # Riverpod Notifier (ViewModel) 与不可变 State
+        ├── views/                   # 页面级组件 (*View)：布局、Context 交互、路由跳转
+        ├── widgets/                 # 模块内私有展示组件 (纯入参渲染，无数据源读取)
+        └── extensions/              # 表现层扩展：将 Domain 状态转换为 UI 文案、颜色
 ```
 
-### 2.1 核心分层红线与数据流向
+### 2.1 依赖关系法则（单向漏斗）
 
-**数据流动约束：**
+```text
+[ features/ (业务模块) ] ──> 依赖 ──> [ shared/ (公共 UI 资产) ] ──> 依赖 ──> [ core/ (底层技术底座) ]
+```
 
-View ➔ ViewModel ➔ Domain Repository (接口) ➔ Data Repository (实现) ➔ DataSource (Remote/Local)。
+1. **core/ 是最底层**：绝对不可 import shared/ 或 features/。
+2. **shared/ 是通用积木**：只依赖 core/ 和 Flutter SDK；**严禁导入任何 features/**（即 shared/ 不得出现任何具体的业务模型、DTO 或 ViewModel）。
+3. **features/ 是消费方**：可自由组合使用 shared/ 的组件和 core/ 的能力。
 
-**DTO 与 Domain 隔离：**
+### 2.2 模块内部 DTO 与 Domain 隔离
 
-RemoteDataSource 只负责调用 Retrofit API 并返回/接收 DTO，严禁出现 Domain 类型。
-
-RepositoryImpl 是 DTO 与 Domain 的唯一转换边界。调用 DTO 的 `toDomain()` / `fromDomain()` 完成清洗后向上传递。
-
-**数据库与网络隔离：**
-
-业务 SQL 必须由具体 feature 的 `*_local_data_source.dart` 编写，Repository 不得直接拼接 SQL。
-
-具体 feature 的 Retrofit API、DTO、RemoteDataSource 必须留在本 feature 的 `data/datasources/`，不得上提至 `core/network/`。
-
-**组合根（DI）规则：**
-
-本 feature 的 Repository Provider 统一在 `data/di/` 声明，返回值类型必须是 Domain 抽象接口。
-
-ViewModel 只能通过 Provider 读取接口，严禁直接 import `data/repositories/*_impl.dart`。
-
-**例外注记：**
-
-`core/storage/app_config_dao.dart` 为全局保留的配置持久化组件，保持现状无需拆分。
-
-### 2.2 Extension（扩展）物理归属
-
-- `core/extensions/`：仅限与业务无关的纯技术工具扩展（如 `BuildContext.unfocus()`、`String.isUrl`）。
-- `features/<feature>/data/models/`：DTO 的 `toDomain()` / `fromDomain()` 转换扩展。
-- `features/<feature>/domain/models/`：Domain Entity 的纯业务计算扩展（纯 Dart，禁止 import UI 库）。
-- `features/<feature>/presentation/extensions/`：Domain 状态到 UI 样式（Color、Icon、展示文案）的映射扩展。
+- RemoteDataSource 只负责调用 Retrofit API 并**返回/接收 DTO**，严禁出现 Domain 类型。
+- RepositoryImpl 是 DTO 与 Domain 的**唯一转换边界**。调用 DTO 的 toDomain() / fromDomain() 完成清洗后向上传递。
+- 业务 SQL 必须由具体 feature 的 `*_local_data_source.dart` 编写，Repository 不得直接拼接 SQL。
 
 ---
 
 ## 3. Freezed 规范（Dart 3.13+ 原生主构造函数）
 
-严禁使用旧版 `const factory Foo(...) = _Foo;`，必须使用主构造函数语法：
+**严禁使用旧版 const factory Foo(...) = \_Foo;**，必须使用主构造函数语法：
 
 ```dart
 // 1. UI State
@@ -103,59 +101,59 @@ class ExampleDto({
 }
 ```
 
-## 4. Few-Shot 标准代码范式
+## 4. 代码注释与 Review 友好性规范（Review-Driven Documentation）
 
-### 4.1 Riverpod ViewModel 范式
+AI 生成的所有代码必须服务于**Code Review**：
+
+1. **类与方法级文档（`///`）**：
+    - 所有的 ViewModel 方法、Repository 契约、Shared 组件必须有中文 `///` 文档。
+    - 明确标注：**设计意图**、**入参边界**、**驱动的状态变化**（如：“触发后将 `isLoading` 置为 true”）。
+2. **行内注释原则（解释 Why，禁止解释 What）**：
+    - ❌ 严禁废话：不要写 `// 初始化变量`、`// if 判断是否为空` 等肉眼可见的语法翻译。
+    - ✅ 解释意图：遇到非显而易见的逻辑、异常捕获、降级逻辑、缓存时间设置，必须说明**业务原因**（如：`// 后端偶发 404 时安全返回空列表，避免阻断页面`）。
+3. **复杂异步链路步骤化**：
+    - 超过 15 行或跨越多个 `await` 的业务方法，必须使用 `// 1. 校验...`、`// 2. 调接口...`、`// 3. 落库...` 进行阶段打点。
+
+## 5. Few-Shot 标准代码范式
+
+### 5.1 业务 View 消费 shared 通用组件范式
 
 ```dart
-// presentation/viewmodels/example_view_model.dart
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:agnes_ai_tester/src/features/example/data/di/example_data_providers.dart';
-import 'package:agnes_ai_tester/src/features/example/presentation/viewmodels/example_state.dart';
+// features/generation/presentation/views/video_preview_card.dart
+import 'package:flutter/material.dart';
+import 'package:agnes_ai_tester/src/features/generation/domain/models/video_task.dart';
+import 'package:agnes_ai_tester/src/shared/widgets/video/app_video_player.dart';
 
-part 'example_view_model.g.dart';
+class VideoPreviewCard extends StatelessWidget {
+  final VideoTask task; // 业务 Domain 实体
 
-@riverpod
-class ExampleViewModel extends _$ExampleViewModel {
+  const VideoPreviewCard({super.key, required this.task});
+
   @override
-  ExampleState build() => const ExampleState();
-
-  // 纯业务校验 + 调 Repository，返回操作结果，绝不接收 BuildContext
-  Future<bool> addItem(String title) async {
-    final trimmed = title.trim();
-    if (trimmed.isEmpty) {
-      state = state.copyWith(error: '内容不能为空');
-      return false;
-    }
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final repository = ref.read(exampleRepositoryProvider);
-      final newItem = await repository.createItem(trimmed);
-
-      state = state.copyWith(
-        items: [...state.items, newItem],
-        isLoading: false,
-      );
-      return true;
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      return false;
-    }
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          Text(task.prompt),
+          // ⭐ 直接像使用原生 Widget 一样消费 shared 通用组件
+          if (task.canPlay)
+            AppVideoPlayer(
+              videoUrl: task.playUrl!,
+              autoPlay: false,
+            ),
+        ],
+      ),
+    );
   }
 }
 ```
 
-### 4.2 View 交互、监听与 Context 消费范式
+### 5.2 View 交互、监听与 Context 消费范式
 
 ```dart
 // presentation/views/example_view.dart
 // 仅展示核心交互：收起键盘、await 结果、mounted 校验、Context 跳转/弹窗
-Future<void> _handleSubmit(
-  BuildContext context,
-  WidgetRef ref,
-  TextEditingController controller,
-) async {
+Future<void> _handleSubmit(BuildContext context, WidgetRef ref, TextEditingController controller) async {
   FocusScope.of(context).unfocus();
 
   final success = await ref
@@ -198,14 +196,9 @@ Widget build(BuildContext context) {
 }
 ```
 
-### 4.3 Repository 协调与 DTO 转换范式
+### 5.3 Repository 协调与 DTO 转换范式
 
 ```dart
-// domain/repositories/example_repository.dart
-abstract interface class ExampleRepository {
-  Future<ExampleItem> createItem(String title);
-}
-
 // data/repositories/example_repository_impl.dart
 class ExampleRepositoryImpl implements ExampleRepository {
   ExampleRepositoryImpl({
@@ -226,7 +219,9 @@ class ExampleRepositoryImpl implements ExampleRepository {
 }
 ```
 
-## 5. 开发与构建指令
+---
+
+## 6. 开发与构建指令
 
 代码变更涉及注解时，必须按序执行：
 
@@ -242,10 +237,14 @@ fvm flutter analyze --no-pub --suppress-analytics
 fvm flutter test --no-pub --suppress-analytics
 ```
 
-## 6. AI 交付前自检清单（Pre-flight Checklist）
+---
+
+## 7. AI 交付前自检清单（Pre-flight Checklist）
 
 AI 在输出代码之前，必须确认：
 
+- [ ] **Review 友好性达标**：核心方法均配备 `///` 意图文档，长逻辑有中文分步打点，未出现无意义废话注释，注释是否使用的是中文。
+- [ ] shared 零业务耦合：shared/ 目录下的组件未 import 任何 features/ 中的模型、DTO 或 ViewModel。
 - [ ] 零 Context 泄漏：ViewModel 中不存在任何 BuildContext 类型的参数或字段。
 - [ ] 无 UI 库污染：ViewModel 所在文件没有引入 package:flutter/material.dart。
 - [ ] 主构造函数语法：所有 Freezed 类均采用 `class Xxx({ ... }) with _$Xxx;`，没有使用 `abstract class + factory`。

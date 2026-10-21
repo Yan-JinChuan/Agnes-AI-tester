@@ -30,20 +30,29 @@ Agnes AI 测试台是一个用于在本地验证与调试 Agnes AI OpenAI 兼容
 
 ## 软件架构
 
-本项目采用 **Feature-First（按功能垂直切分）结合 MVVM + Repository** 的架构。UI 逻辑、业务流程与底层数据访问严格物理隔离：
+本项目采用 **三层分级（Core / Shared / Features）结合 Feature-First MVVM + Repository** 的工程架构：
 
 ```text
 lib/src/
-├── app.dart                         MaterialApp.router 全局配置与主题定义
-├── app_shell.dart                   应用主框架：导航切换与连接设置入口
-├── routing/                         go_router 路由表与路由拦截配置
-├── core/                            跨功能公共基础设施（纯技术支持，不承载业务）
-│   ├── cache/                       统一媒体文件缓存服务 (AppMediaCache)
-│   ├── config/                      运行时全局配置与常驻内存快照
-│   ├── network/                     DioApiClient、拦截器与统一网络异常
-│   └── storage/                     SQLite 数据库工厂与迁移管理 (AppDatabase)
-└── features/                        业务功能模块（Feature-First）
-    ├── chat/                        典型功能模块内部结构示例：
+├── app.dart                         MaterialApp.router 全局配置与应用入口
+├── app_shell.dart                   应用主框架壳：导航联动与设置入口
+├── routing/                         go_router 声明式路由表
+│
+├── core/                            【纯技术基建底座】（无视觉 UI，零具体业务）
+│   ├── cache/                       AppMediaCache、视频边下边播本地代理服务 (Proxy)
+│   ├── config/                      运行时全局配置 (AppConfig) 与常驻内存状态
+│   ├── network/                     DioApiClient、全局拦截器与统一网络异常
+│   └── storage/                     SQLite 数据库工厂与迁移 (AppDatabase)、DAO
+│
+├── shared/                          【跨功能公共资产】（零业务感知，高复用积木）
+│   ├── theme/                       全局主题系统 (AppColors, AppTextStyles)
+│   └── widgets/                     通用 UI 控件 (按组件属性分类)
+│       ├── image/                   通用图片加载组件 (AppCachedImage)
+│       ├── video/                   通用视频播放器组件 (AppVideoPlayer)
+│       └── buttons/                 通用加载按钮 (AppLoadingButton)
+│
+└── features/                        【业务功能模块】（Feature-First）
+    ├── chat/                        典型业务功能模块骨架：
     │   ├── data/
     │   │   ├── datasources/         Retrofit API、RemoteDataSource、LocalDataSource
     │   │   ├── models/              DTO 网络模型 (Freezed + fromJson)
@@ -55,16 +64,16 @@ lib/src/
     │   └── presentation/
     │       ├── viewmodels/          Riverpod Notifier (ViewModel) 与不可变 State
     │       ├── views/               页面级组件 (*View)：布局、Context 交互、路由跳转
-    │       ├── widgets/             功能内可复用 UI 组件 (纯展示)
+    │       ├── widgets/             功能内可复用展示组件 (纯展示)
     │       └── extensions/          表现层扩展 (Domain 状态到 UI 颜色/文案映射)
-    ├── generation/                  图片与视频生成功能
-    └── settings/                    连接设置与模型目录管理
+    ├── generation/                  图片与视频生成业务模块
+    └── settings/                    连接设置与模型目录管理模块
 ```
 
 ### 单向数据流动模型
 
 ```text
-[ View (UI Widget) ]
+[ View (UI Widget) ] ──消费──> [ Shared 组件 (如 AppVideoPlayer) ]
        │ 1. 监听 State (ref.watch) / 触发业务动作 (ref.read)
        ▼
 [ ViewModel (Riverpod Notifier) ]
@@ -81,14 +90,14 @@ lib/src/
 [ View ] (响应式重绘界面；由 View 自行持有 Context 执行弹窗或路由跳转)
 ```
 
-注意：完整的架构禁令、各层调用规则及 AI 编码约束，请查阅根目录下的 `AGENTS.md`。
+> **提示**：完整的架构禁令、各层调用规则及 AI 编码约束，请查阅根目录下的 **AGENTS.md**。
 
 ### 网络层与模型约定
 
-1. **通用客户端与业务接口分离**：  
-   `lib/src/core/network/` 只负责 Dio 实例、Base URL、鉴权、超时、日志和异常归一化，不包含具体业务。各业务模块的 Retrofit API、DTO 和 RemoteDataSource 严格收敛于各自的 `features/<feature>/data/datasources/` 中。
+1. **通用客户端与业务接口分离**：
+   `core/network/` 只负责 Dio 实例、Base URL、鉴权拦截器、超时与异常归一化；各业务模块的 Retrofit API、DTO 和 RemoteDataSource 严格内聚于各自的 `features/<feature>/data/datasources/` 中。
 
-2. **现代 Freezed 语法**：  
+2. **现代 Freezed 语法**：
    所有不可变 State 与网络 DTO 均采用 **Dart 3.13+ 主构造函数** 编写，彻底废弃旧版工厂构造方法：
 
    ```dart
@@ -105,12 +114,12 @@ lib/src/
 
 3. **分层数据防腐**：
 
-    - **RemoteDataSource**：只负责与 Retrofit API 交互，**输入输出严格限制为 DTO**，不感知 Domain 模型。
-    - **RepositoryImpl**：充当防腐隔离墙，统一调用 DTO 的 `toDomain()` / `fromDomain()` 完成业务实体转换，并协调本地 SQLite 缓存。
-    - **表现层隔离**：ViewModel 与 View 绝不接触 Dio `Response`、SQLite `Database` 或原始 `Map`。
+   - **RemoteDataSource**：只负责与 Retrofit API 交互，**输入输出严格限制为 DTO**，不感知 Domain 模型。
+   - **RepositoryImpl**：充当防腐隔离墙，统一调用 DTO 的 `toDomain()` / `fromDomain()` 完成业务实体转换，并协调本地 SQLite 缓存。
+   - **表现层隔离**：ViewModel 与 View 绝不接触 Dio Response、SQLite Database 或原始 Map。
 
-4. **数据库职责收敛**：  
-   `AppDatabase` 仅负责数据库生命周期、多平台路径计算与版本迁移。具体的业务 CRUD SQL 严格隔离在各 feature 的 `*_local_data_source.dart` 中。
+4. **数据库职责收敛**：
+   `AppDatabase` 仅负责数据库连接生命周期、多平台路径计算与版本迁移。具体的业务 CRUD SQL 严格隔离在各 feature 的 `*_local_data_source.dart` 中。
 
 ---
 
@@ -130,7 +139,7 @@ fvm flutter run
 
 ### 2. 代码生成与静态校验
 
-当修改了带有 `@riverpod`、`@freezed`、`@RestApi` 或 `@JsonSerializable` 注解的文件后，必须运行 `build_runner` 生成代码：
+当修改了带有 `@riverpod`、`@freezed`、`@RestApi` 或 `@JsonSerializable` 注解的文件后，必须运行 build_runner 生成代码：
 
 ```bash
 # 执行代码生成并覆盖冲突
@@ -173,7 +182,7 @@ fvm flutter test --no-pub --suppress-analytics
 - **图像生成测试**：POST /v1/images/generations
 - **视频任务创建**：POST /v1/videos
 - **视频状态轮询**：GET /agnesapi?video_id=...
-    - 任务完成后自动解析 `metadata.url` 播放源，并提取 `size`、`seconds`、`metadata.size_mapping` 等元数据持久化至本地。
+   - 任务完成后自动解析 `metadata.url` 播放源，并提取 `size`、`seconds`、`metadata.size_mapping` 等元数据持久化至本地。
 
 ---
 

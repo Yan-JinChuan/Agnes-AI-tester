@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/cache/app_media_cache.dart';
 import '../../domain/models/video_generation_options.dart';
 import '../../domain/models/video_generation_record.dart';
 import '../extensions/video_job_status_ui_extension.dart';
-import 'cached_video_player.dart';
+import 'video_job_player.dart';
 
 class VideoJobCard extends StatelessWidget {
   const VideoJobCard({
     required this.record,
-    required this.cache,
     required this.isLoading,
     required this.onPoll,
     super.key,
   });
 
   final VideoGenerationRecord record;
-  final AppMediaCache cache;
   final bool isLoading;
   final VoidCallback onPoll;
 
@@ -88,7 +85,7 @@ class VideoJobCard extends StatelessWidget {
             ],
             if (job.url != null && job.url!.isNotEmpty) ...[
               const SizedBox(height: 16),
-              CachedVideoPlayer(url: job.url!, cacheKey: job.id, cache: cache),
+              VideoJobPlayer(url: job.url!, cacheKey: job.id),
               const SizedBox(height: 12),
               const Text('视频地址', style: TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
