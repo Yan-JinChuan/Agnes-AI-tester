@@ -27,20 +27,20 @@ $SettingsStateCopyWith<SettingsState> get copyWith => _$SettingsStateCopyWithImp
 @override
 bool operator ==(Object other) {
   final _this = this as SettingsState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.error, _this.error) || other.error == _this.error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsState&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.error, _this.error) || other.error == _this.error)&&(identical(other.cacheUsage, _this.cacheUsage) || other.cacheUsage == _this.cacheUsage)&&(identical(other.isLoadingCache, _this.isLoadingCache) || other.isLoadingCache == _this.isLoadingCache)&&(identical(other.isClearingCache, _this.isClearingCache) || other.isClearingCache == _this.isClearingCache));
 }
 
 
 @override
 int get hashCode {
   final _this = this as SettingsState;
-  return Object.hash(runtimeType,_this.isSaving,_this.error);
+  return Object.hash(runtimeType,_this.isSaving,_this.error,_this.cacheUsage,_this.isLoadingCache,_this.isClearingCache);
 }
 
 @override
 String toString() {
   final _this = this as SettingsState;
-  return 'SettingsState(isSaving: ${_this.isSaving}, error: ${_this.error})';
+  return 'SettingsState(isSaving: ${_this.isSaving}, error: ${_this.error}, cacheUsage: ${_this.cacheUsage}, isLoadingCache: ${_this.isLoadingCache}, isClearingCache: ${_this.isClearingCache})';
 }
 
 
@@ -51,7 +51,7 @@ abstract mixin class $SettingsStateCopyWith<$Res>  {
   factory $SettingsStateCopyWith(SettingsState value, $Res Function(SettingsState) _then) = _$SettingsStateCopyWithImpl;
 @useResult
 $Res call({
- bool isSaving, String? error
+ bool isSaving, String? error, CacheUsage? cacheUsage, bool isLoadingCache, bool isClearingCache
 });
 
 
@@ -68,11 +68,14 @@ class _$SettingsStateCopyWithImpl<$Res>
 
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isSaving = null,Object? error = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isSaving = null,Object? error = freezed,Object? cacheUsage = freezed,Object? isLoadingCache = null,Object? isClearingCache = null,}) {
   return _then(SettingsState(
 isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,cacheUsage: freezed == cacheUsage ? _self.cacheUsage : cacheUsage // ignore: cast_nullable_to_non_nullable
+as CacheUsage?,isLoadingCache: null == isLoadingCache ? _self.isLoadingCache : isLoadingCache // ignore: cast_nullable_to_non_nullable
+as bool,isClearingCache: null == isClearingCache ? _self.isClearingCache : isClearingCache // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

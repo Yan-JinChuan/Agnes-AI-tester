@@ -66,7 +66,7 @@ class AppVideoPlayerController extends ChangeNotifier
     required this.cacheKey,
     required this.cache,
     this.httpHeaders = const <String, String>{},
-    this.invalidateCacheIfOlderThan = const Duration(days: 7),
+    this.invalidateCacheIfOlderThan = const Duration(days: 30),
   });
 
   final Uri remoteUri;

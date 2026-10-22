@@ -64,10 +64,7 @@ class _VideoJobPlayerState extends ConsumerState<VideoJobPlayer> {
       'playing=${value.isPlaying}, completed=${value.isCompleted}',
     );
     try {
-      if (value.isCompleted) {
-        await _controller.seekTo(Duration.zero);
-        await _controller.play();
-      } else if (value.isPlaying) {
+      if (value.isPlaying) {
         await _controller.pause();
       } else {
         await _controller.play();

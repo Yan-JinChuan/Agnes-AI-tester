@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,13 +11,24 @@ import 'package:agnes_ai_tester/src/features/settings/presentation/viewmodels/se
 
 import '../../../../core/config/app_config_provider.dart';
 
-/// Edits the connection, model and local cache settings for the application.
+/// 编辑应用的连接、模型和本地缓存设置。
 class ConnectionSettingsDialog extends ConsumerStatefulWidget {
   const ConnectionSettingsDialog({super.key});
 
   @override
   ConsumerState<ConnectionSettingsDialog> createState() =>
       _ConnectionSettingsDialogState();
+}
+
+String _formatCacheBytes(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  if (bytes < 1024 * 1024) {
+    return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  }
+  if (bytes < 1024 * 1024 * 1024) {
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
 }
 
 class _ConnectionSettingsDialogState
@@ -42,6 +55,14 @@ class _ConnectionSettingsDialogState
     _cacheDirectoryController = TextEditingController(
       text: config.cacheDirectory,
     );
+    // 首帧完成后再修改 Provider，避免 Riverpod 在 widget 挂载期间拒绝状态更新。
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        unawaited(
+          ref.read(settingsViewModelProvider.notifier).loadCacheUsage(),
+        );
+      }
+    });
   }
 
   @override
@@ -117,6 +138,79 @@ class _ConnectionSettingsDialogState
   void _showMessage(String message) {
     if (!mounted) return;
     setState(() => _dialogMessage = message);
+  }
+
+  Future<void> _clearCache() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('清除缓存'),
+        content: const Text('将删除图片和视频缓存，是否继续？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('确认清除'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+
+    final cleared = await ref
+        .read(settingsViewModelProvider.notifier)
+        .clearCache();
+    if (mounted && cleared) _showMessage('缓存已清除');
+  }
+
+  Widget _buildCacheSection(SettingsState state) {
+    final usage = state.cacheUsage;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: Text(
+                '缓存管理',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            if (state.isLoadingCache || state.isClearingCache)
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (usage == null)
+          Text(
+            state.isLoadingCache ? '正在读取缓存占用…' : '暂无缓存统计',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5),
+          )
+        else
+          Text(
+            '图片缓存：${_formatCacheBytes(usage.imageBytes)}\n'
+            '普通视频：${_formatCacheBytes(usage.videoBytes)}\n'
+            '总占用：${_formatCacheBytes(usage.totalBytes)}',
+            style: TextStyle(color: Colors.grey.shade700, fontSize: 12.5),
+          ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: OutlinedButton.icon(
+            onPressed: state.isClearingCache ? null : _clearCache,
+            icon: const Icon(Icons.delete_sweep_outlined),
+            label: const Text('清除全部缓存'),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildModelField({
@@ -285,6 +379,10 @@ class _ConnectionSettingsDialogState
                   readOnly: true,
                   onTap: _pickCacheDirectory,
                 ),
+              ],
+              if (!kIsWeb) ...[
+                const SizedBox(height: 14),
+                _buildCacheSection(settingsState),
               ],
               const SizedBox(height: 14),
               Builder(
