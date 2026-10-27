@@ -141,6 +141,8 @@ class _ImageGenerationViewState extends ConsumerState<ImageGenerationView> {
                   history: state.history,
                   cache: cache,
                   onSelect: viewModel.selectHistory,
+                  onDelete: viewModel.deleteHistory,
+                  selectedRecord: state.result,
                 ),
               ],
             ],

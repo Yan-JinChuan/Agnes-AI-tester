@@ -38,7 +38,6 @@ class AppConfigDao {
 }
 
 @Riverpod(keepAlive: true)
-Future<AppConfigDao> appConfigDao(Ref ref) async {
-  final db = await ref.watch(appDatabaseProvider).database;
-  return AppConfigDao(db);
+AppConfigDao appConfigDao(Ref ref) {
+  return AppConfigDao(ref.watch(appDatabaseProvider).database);
 }

@@ -19,23 +19,33 @@ abstract class DataBaseTableNames {
       "idx_video_generations_updated";
 }
 
-@riverpod
+/// 提供应用级数据库依赖的注入入口。
+///
+/// 数据库必须由应用组合根（`main()`）完成异步打开后通过 override 注入，
+/// 这样数据源在创建时拿到的就是可直接使用的连接，而不会把初始化等待
+/// 泄漏到每一次 SQL 操作中。
+@Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {
-  final database = AppDatabase();
-  ref.onDispose(database.close);
-  return database;
+  throw StateError(
+    'AppDatabase 尚未初始化，请在 ProviderScope 中覆盖 appDatabaseProvider。',
+  );
 }
 
 class AppDatabase {
-  Database? _database;
+  AppDatabase._(this._database);
 
-  Future<Database> get database async {
-    final current = _database;
-    if (current != null && current.isOpen) return current;
+  final Database _database;
 
-    final databasePath = await _databasePath();
-    _database = await getDatabaseFactory().openDatabase(
-      databasePath,
+  /// 打开数据库并完成建表或迁移。
+  ///
+  /// `databasePath` 仅用于测试和特殊宿主环境；生产环境省略时使用应用文档目录。
+  static Future<AppDatabase> open({
+    String? databasePath,
+    DatabaseFactory? factory,
+  }) async {
+    final resolvedPath = databasePath ?? await _databasePath();
+    final database = await (factory ?? getDatabaseFactory()).openDatabase(
+      resolvedPath,
       options: OpenDatabaseOptions(
         version: 3,
         onConfigure: (db) async {
@@ -54,22 +64,24 @@ class AppDatabase {
         },
       ),
     );
-    return _database!;
+    return AppDatabase._(database);
   }
 
-  Future<String> _databasePath() async {
+  /// 返回已经完成初始化的 SQLite 连接。
+  Database get database => _database;
+
+  static Future<String> _databasePath() async {
     if (kIsWeb) return 'agnes_ai_tester.db';
     final directory = await getApplicationDocumentsDirectory();
     return path.join(directory.path, 'agnes_ai_tester.db');
   }
 
+  /// 关闭数据库连接；重复调用不会产生副作用。
   Future<void> close() async {
-    final current = _database;
-    _database = null;
-    if (current != null && current.isOpen) await current.close();
+    if (_database.isOpen) await _database.close();
   }
 
-  Future<void> _createCoreTables(Database db) async {
+  static Future<void> _createCoreTables(Database db) async {
     await db.execute('''
       CREATE TABLE ${DataBaseTableNames.conversations} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -95,7 +107,7 @@ class AppDatabase {
     );
   }
 
-  Future<void> _createGenerationTables(Database db) async {
+  static Future<void> _createGenerationTables(Database db) async {
     await db.execute('''
       CREATE TABLE ${DataBaseTableNames.settings} (
         key TEXT PRIMARY KEY,
@@ -137,7 +149,7 @@ class AppDatabase {
     );
   }
 
-  Future<void> _upgradeVideoGenerationToV3(Database db) async {
+  static Future<void> _upgradeVideoGenerationToV3(Database db) async {
     await db.execute(
       "ALTER TABLE ${DataBaseTableNames.videoGenerations} ADD COLUMN request_json TEXT NOT NULL DEFAULT '{}'",
     );

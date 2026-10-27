@@ -197,4 +197,8 @@ class _UnusedVideoLocal implements VideoLocalDataSource {
     required String videoId,
     required Map<String, Object?> values,
   }) => throw UnimplementedError();
+
+  @override
+  Future<void> deleteGeneration({required String videoId}) =>
+      throw UnimplementedError();
 }

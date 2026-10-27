@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../../../core/storage/app_database.dart';
 
@@ -15,21 +16,26 @@ abstract interface class VideoLocalDataSource {
     required String videoId,
     required Map<String, Object?> values,
   });
+
+  /// Removes one video generation row from the local database.
+  Future<void> deleteGeneration({required String videoId});
 }
 
 @riverpod
 VideoLocalDataSource videoLocalDataSource(Ref ref) {
-  return SqliteVideoLocalDataSource(database: ref.watch(appDatabaseProvider));
+  return SqliteVideoLocalDataSource(
+    database: ref.watch(appDatabaseProvider).database,
+  );
 }
 
 class SqliteVideoLocalDataSource implements VideoLocalDataSource {
   const SqliteVideoLocalDataSource({required this.database});
 
-  final AppDatabase database;
+  final Database database;
 
   @override
   Future<List<Map<String, Object?>>> loadHistory() async {
-    return (await database.database).query(
+    return database.query(
       DataBaseTableNames.videoGenerations,
       orderBy: 'updated_at DESC, id DESC',
     );
@@ -37,7 +43,7 @@ class SqliteVideoLocalDataSource implements VideoLocalDataSource {
 
   @override
   Future<Map<String, Object?>?> findByVideoId(String videoId) async {
-    final rows = await (await database.database).query(
+    final rows = await database.query(
       DataBaseTableNames.videoGenerations,
       where: 'video_id = ?',
       whereArgs: [videoId],
@@ -48,9 +54,7 @@ class SqliteVideoLocalDataSource implements VideoLocalDataSource {
 
   @override
   Future<int> insertGeneration(Map<String, Object?> values) {
-    return database.database.then(
-      (db) => db.insert(DataBaseTableNames.videoGenerations, values),
-    );
+    return database.insert(DataBaseTableNames.videoGenerations, values);
   }
 
   @override
@@ -58,9 +62,18 @@ class SqliteVideoLocalDataSource implements VideoLocalDataSource {
     required String videoId,
     required Map<String, Object?> values,
   }) async {
-    await (await database.database).update(
+    await database.update(
       DataBaseTableNames.videoGenerations,
       values,
+      where: 'video_id = ?',
+      whereArgs: [videoId],
+    );
+  }
+
+  @override
+  Future<void> deleteGeneration({required String videoId}) async {
+    await database.delete(
+      DataBaseTableNames.videoGenerations,
       where: 'video_id = ?',
       whereArgs: [videoId],
     );

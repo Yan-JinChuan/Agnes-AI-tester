@@ -8,12 +8,15 @@ part of 'settings_view_model.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// 管理连接配置保存、模型预览和媒体缓存操作。
 
 @ProviderFor(SettingsViewModel)
 final settingsViewModelProvider = SettingsViewModelProvider._();
 
+/// 管理连接配置保存、模型预览和媒体缓存操作。
 final class SettingsViewModelProvider
     extends $NotifierProvider<SettingsViewModel, SettingsState> {
+  /// 管理连接配置保存、模型预览和媒体缓存操作。
   SettingsViewModelProvider._()
     : super(
         from: null,
@@ -42,6 +45,8 @@ final class SettingsViewModelProvider
 }
 
 String _$settingsViewModelHash() => r'ac283934deef7b7ded14ec004475bde5449bb86c';
+
+/// 管理连接配置保存、模型预览和媒体缓存操作。
 
 abstract class _$SettingsViewModel extends $Notifier<SettingsState> {
   SettingsState build();

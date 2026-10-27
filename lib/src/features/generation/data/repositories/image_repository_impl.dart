@@ -58,6 +58,11 @@ class ImageRepositoryImpl implements ImageRepository {
     return record.copyWith(id: id);
   }
 
+  @override
+  Future<void> delete({required int id}) {
+    return local.deleteGeneration(id: id);
+  }
+
   ImageGenerationResult _toDomain(ImageData data) {
     try {
       return data.toDomain();

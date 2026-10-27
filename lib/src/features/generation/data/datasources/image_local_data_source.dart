@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../../../core/storage/app_database.dart';
 
@@ -8,21 +9,26 @@ abstract interface class ImageLocalDataSource {
   Future<List<Map<String, Object?>>> loadHistory();
 
   Future<int> insertGeneration(Map<String, Object?> values);
+
+  /// Removes one image generation row from the local database.
+  Future<void> deleteGeneration({required int id});
 }
 
 @riverpod
 ImageLocalDataSource imageLocalDataSource(Ref ref) {
-  return SqliteImageLocalDataSource(database: ref.watch(appDatabaseProvider));
+  return SqliteImageLocalDataSource(
+    database: ref.watch(appDatabaseProvider).database,
+  );
 }
 
 class SqliteImageLocalDataSource implements ImageLocalDataSource {
   const SqliteImageLocalDataSource({required this.database});
 
-  final AppDatabase database;
+  final Database database;
 
   @override
   Future<List<Map<String, Object?>>> loadHistory() async {
-    return (await database.database).query(
+    return database.query(
       DataBaseTableNames.imageGenerations,
       orderBy: 'created_at DESC, id DESC',
     );
@@ -30,8 +36,15 @@ class SqliteImageLocalDataSource implements ImageLocalDataSource {
 
   @override
   Future<int> insertGeneration(Map<String, Object?> values) {
-    return database.database.then(
-      (db) => db.insert(DataBaseTableNames.imageGenerations, values),
+    return database.insert(DataBaseTableNames.imageGenerations, values);
+  }
+
+  @override
+  Future<void> deleteGeneration({required int id}) async {
+    await database.delete(
+      DataBaseTableNames.imageGenerations,
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 }

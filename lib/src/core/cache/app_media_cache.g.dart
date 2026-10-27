@@ -8,13 +8,17 @@ part of 'app_media_cache.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// 根据运行时配置创建全局媒体缓存服务。
 
 @ProviderFor(appMediaCache)
 final appMediaCacheProvider = AppMediaCacheProvider._();
 
+/// 根据运行时配置创建全局媒体缓存服务。
+
 final class AppMediaCacheProvider
     extends $FunctionalProvider<AppMediaCache, AppMediaCache, AppMediaCache>
     with $Provider<AppMediaCache> {
+  /// 根据运行时配置创建全局媒体缓存服务。
   AppMediaCacheProvider._()
     : super(
         from: null,

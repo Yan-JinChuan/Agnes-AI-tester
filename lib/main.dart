@@ -11,8 +11,8 @@ import 'src/core/storage/app_database.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final db = AppDatabase();
-  final dao = AppConfigDao(await db.database);
+  final db = await AppDatabase.open();
+  final dao = AppConfigDao(db.database);
   final initialConfig = await dao.readConfig() ?? const AppConfig();
 
   fvp.registerWith(

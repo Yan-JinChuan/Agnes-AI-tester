@@ -8,13 +8,23 @@ import 'package:agnes_ai_tester/src/core/cache/media_cache_repository_provider.d
 import 'package:agnes_ai_tester/src/core/config/app_config.dart';
 import 'package:agnes_ai_tester/src/core/config/app_config_provider.dart';
 import 'package:agnes_ai_tester/src/app.dart';
+import 'package:agnes_ai_tester/src/features/chat/data/di/chat_data_providers.dart';
+import 'package:agnes_ai_tester/src/features/chat/domain/models/chat_message.dart';
+import 'package:agnes_ai_tester/src/features/chat/domain/models/conversation_summary.dart';
+import 'package:agnes_ai_tester/src/features/chat/domain/repositories/chat_repository.dart';
+import 'package:agnes_ai_tester/src/features/generation/data/di/generation_data_providers.dart';
+import 'package:agnes_ai_tester/src/features/generation/domain/models/image_generation_record.dart';
+import 'package:agnes_ai_tester/src/features/generation/domain/models/video_generation_options.dart';
+import 'package:agnes_ai_tester/src/features/generation/domain/models/video_generation_record.dart';
+import 'package:agnes_ai_tester/src/features/generation/domain/repositories/image_repository.dart';
+import 'package:agnes_ai_tester/src/features/generation/domain/repositories/video_repository.dart';
 import 'package:agnes_ai_tester/src/features/settings/presentation/views/connection_settings_dialog.dart';
 
 void main() {
   testWidgets('renders the routed Agnes tester shell', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: AgnesApp()));
+    await _pumpAgnesApp(tester);
 
     expect(find.text('Agnes AI 测试台'), findsOneWidget);
     expect(find.text('文本聊天'), findsNWidgets(2));
@@ -25,7 +35,7 @@ void main() {
   testWidgets('go_router navigates between generation modules', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: AgnesApp()));
+    await _pumpAgnesApp(tester);
 
     await tester.tap(find.text('图片生成'));
     await tester.pumpAndSettle();
@@ -37,15 +47,9 @@ void main() {
   });
 
   testWidgets('connection settings are editable', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          mediaCacheRepositoryProvider.overrideWithValue(
-            _FakeMediaCacheRepository(usage: CacheUsage.empty),
-          ),
-        ],
-        child: const AgnesApp(),
-      ),
+    await _pumpAgnesApp(
+      tester,
+      cacheRepository: _FakeMediaCacheRepository(usage: CacheUsage.empty),
     );
 
     await tester.tap(find.byTooltip('连接设置'));
@@ -99,6 +103,76 @@ void main() {
     expect(repository.clearCalled, isTrue);
     expect(find.textContaining('总占用：0 B'), findsOneWidget);
   });
+}
+
+Future<void> _pumpAgnesApp(
+  WidgetTester tester, {
+  MediaCacheRepository? cacheRepository,
+}) async {
+  final overrides = [
+    chatRepositoryProvider.overrideWithValue(_FakeChatRepository()),
+    imageRepositoryProvider.overrideWithValue(_FakeImageRepository()),
+    videoRepositoryProvider.overrideWithValue(_FakeVideoRepository()),
+    if (cacheRepository != null)
+      mediaCacheRepositoryProvider.overrideWithValue(cacheRepository),
+  ];
+  await tester.pumpWidget(
+    ProviderScope(overrides: overrides, child: const AgnesApp()),
+  );
+}
+
+class _FakeChatRepository implements ChatRepository {
+  @override
+  Future<List<ChatMessage>> loadMessages(int conversationId) async => const [];
+
+  @override
+  Future<List<ConversationSummary>> loadConversations() async => const [];
+
+  @override
+  Future<int> createConversation(String firstPrompt) async => 1;
+
+  @override
+  Future<void> saveMessage(ChatMessage message, int conversationId) async {}
+
+  @override
+  Future<String> completeChat(List<ChatMessage> messages) async => '测试回复';
+}
+
+class _FakeImageRepository implements ImageRepository {
+  @override
+  Future<List<ImageGenerationRecord>> history() async => const [];
+
+  @override
+  Future<ImageGenerationRecord> generate({
+    required String prompt,
+    required String size,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> delete({required int id}) async {}
+}
+
+class _FakeVideoRepository implements VideoRepository {
+  @override
+  Future<List<VideoGenerationRecord>> history() async => const [];
+
+  @override
+  Future<VideoGenerationRecord> create({
+    required String prompt,
+    required VideoGenerationOptions options,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<VideoGenerationRecord> poll({required String videoId}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> delete({required String videoId}) async {}
 }
 
 class _FakeMediaCacheRepository implements MediaCacheRepository {

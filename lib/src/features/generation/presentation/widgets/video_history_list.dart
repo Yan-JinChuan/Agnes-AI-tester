@@ -8,11 +8,39 @@ class VideoHistoryList extends StatelessWidget {
   const VideoHistoryList({
     required this.history,
     required this.onSelect,
+    required this.onDelete,
+    this.selectedVideoId,
     super.key,
   });
 
   final List<VideoGenerationRecord> history;
   final ValueChanged<VideoGenerationRecord> onSelect;
+  final Future<void> Function(VideoGenerationRecord) onDelete;
+  final String? selectedVideoId;
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    VideoGenerationRecord record,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('删除视频记录？'),
+        content: const Text('删除后只会移除本地历史记录，无法恢复。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await onDelete(record);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +60,7 @@ class VideoHistoryList extends StatelessWidget {
           itemBuilder: (context, index) {
             final record = history[index];
             final color = record.status.resolveColor(context);
+            final isSelected = record.videoId == selectedVideoId;
             return Card(
               child: InkWell(
                 onTap: () => onSelect(record),
@@ -67,7 +96,12 @@ class VideoHistoryList extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right),
+                      IconButton(
+                        tooltip: '删除记录',
+                        onPressed: () => _confirmDelete(context, record),
+                        icon: const Icon(Icons.delete_outline),
+                      ),
+                      Icon(isSelected ? Icons.expand_less : Icons.expand_more),
                     ],
                   ),
                 ),

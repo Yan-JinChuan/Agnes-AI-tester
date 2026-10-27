@@ -10,9 +10,8 @@ part 'chat_data_providers.g.dart';
 
 @riverpod
 ChatRepository chatRepository(Ref ref) {
-  return ChatRepositoryImpl(
-    remote: ref.watch(chatRemoteDataSourceProvider),
-    local: ref.watch(chatLocalDataSourceProvider),
-    model: ref.watch(appConfigProvider).textModel,
-  );
+  final remote = ref.watch(chatRemoteDataSourceProvider);
+  final local = ref.watch(chatLocalDataSourceProvider);
+  final model = ref.watch(appConfigProvider).textModel;
+  return ChatRepositoryImpl(remote: remote, local: local, model: model);
 }

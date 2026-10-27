@@ -91,6 +91,11 @@ class VideoRepositoryImpl implements VideoRepository {
     return record;
   }
 
+  @override
+  Future<void> delete({required String videoId}) {
+    return local.deleteGeneration(videoId: videoId);
+  }
+
   VideoJob _toDomain(VideoJobResponse response, {String? fallbackId}) {
     try {
       return response.toDomain(fallbackId: fallbackId);

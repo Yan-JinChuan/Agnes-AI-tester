@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../../../core/storage/app_database.dart';
 
@@ -23,17 +24,19 @@ abstract interface class ChatLocalDataSource {
 
 @riverpod
 ChatLocalDataSource chatLocalDataSource(Ref ref) {
-  return SqliteChatLocalDataSource(database: ref.watch(appDatabaseProvider));
+  final appDatabase = ref.watch(appDatabaseProvider);
+  final database = appDatabase.database;
+  return SqliteChatLocalDataSource(database: database);
 }
 
 class SqliteChatLocalDataSource implements ChatLocalDataSource {
   const SqliteChatLocalDataSource({required this.database});
 
-  final AppDatabase database;
+  final Database database;
 
   @override
   Future<List<Map<String, Object?>>> loadMessages(int conversationId) async {
-    return (await database.database).query(
+    return database.query(
       DataBaseTableNames.messages,
       where: 'conversation_id = ?',
       whereArgs: [conversationId],
@@ -43,7 +46,7 @@ class SqliteChatLocalDataSource implements ChatLocalDataSource {
 
   @override
   Future<List<Map<String, Object?>>> loadConversations() async {
-    return (await database.database).query(
+    return database.query(
       DataBaseTableNames.conversations,
       orderBy: 'updated_at DESC',
     );
@@ -52,7 +55,7 @@ class SqliteChatLocalDataSource implements ChatLocalDataSource {
   @override
   Future<int> createConversation(String title) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    return (await database.database).insert(DataBaseTableNames.conversations, {
+    return database.insert(DataBaseTableNames.conversations, {
       'title': title.trim().isEmpty ? '新对话' : title.trim(),
       'created_at': now,
       'updated_at': now,
@@ -66,14 +69,13 @@ class SqliteChatLocalDataSource implements ChatLocalDataSource {
     required String content,
     required DateTime createdAt,
   }) async {
-    final db = await database.database;
-    final id = await db.insert(DataBaseTableNames.messages, {
+    final id = await database.insert(DataBaseTableNames.messages, {
       'conversation_id': conversationId,
       'role': role,
       'content': content,
       'created_at': createdAt.millisecondsSinceEpoch,
     });
-    await db.update(
+    await database.update(
       DataBaseTableNames.conversations,
       {'updated_at': createdAt.millisecondsSinceEpoch},
       where: 'id = ?',
@@ -84,7 +86,7 @@ class SqliteChatLocalDataSource implements ChatLocalDataSource {
 
   @override
   Future<void> deleteConversation(int conversationId) async {
-    await (await database.database).delete(
+    await database.delete(
       DataBaseTableNames.conversations,
       where: 'id = ?',
       whereArgs: [conversationId],

@@ -7,4 +7,7 @@ abstract interface class ImageRepository {
     required String prompt,
     required String size,
   });
+
+  /// Deletes one persisted image generation by its SQLite identifier.
+  Future<void> delete({required int id});
 }

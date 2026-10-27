@@ -55,4 +55,4 @@ final class ChatLocalDataSourceProvider
 }
 
 String _$chatLocalDataSourceHash() =>
-    r'2dfe76ba99b4aa8b2e099c20855a35fd07d525cf';
+    r'113945d8fef4e274d0d3a67888ce593b9e433a9d';

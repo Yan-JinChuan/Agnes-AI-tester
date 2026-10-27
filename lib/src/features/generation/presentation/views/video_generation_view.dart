@@ -146,6 +146,8 @@ class _VideoGenerationViewState extends ConsumerState<VideoGenerationView> {
                   VideoHistoryList(
                     history: state.history,
                     onSelect: viewModel.selectHistory,
+                    onDelete: viewModel.deleteHistory,
+                    selectedVideoId: state.job?.id,
                   ),
                 ],
               ],

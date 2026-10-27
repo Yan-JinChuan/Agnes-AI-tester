@@ -15,7 +15,7 @@ class AppConfigNotifier extends _$AppConfigNotifier {
 
   Future<void> setConfig(AppConfig newConfig) async {
     state = newConfig;
-    final dao = await ref.read(appConfigDaoProvider.future);
+    final dao = ref.read(appConfigDaoProvider);
     await dao.writeConfig(newConfig);
   }
 

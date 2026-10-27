@@ -76,6 +76,31 @@ class ImageGenerationViewModel extends _$ImageGenerationViewModel {
   }
 
   void selectHistory(ImageGenerationRecord record) {
-    state = state.copyWith(result: record, error: null);
+    final isSelected =
+        identical(state.result, record) ||
+        (record.id != null && state.result?.id == record.id);
+    state = state.copyWith(result: isSelected ? null : record, error: null);
+  }
+
+  /// Deletes a persisted image and closes it when it is the visible result.
+  Future<void> deleteHistory(ImageGenerationRecord record) async {
+    final id = record.id;
+    if (id == null) {
+      state = state.copyWith(error: '该图片记录尚未保存，无法删除。');
+      return;
+    }
+
+    try {
+      await _repository.delete(id: id);
+      final wasSelected =
+          identical(state.result, record) || state.result?.id == id;
+      state = state.copyWith(
+        history: state.history.where((item) => item.id != id).toList(),
+        result: wasSelected ? null : state.result,
+        error: null,
+      );
+    } catch (error) {
+      state = state.copyWith(error: readableErrorMessage(error));
+    }
   }
 }

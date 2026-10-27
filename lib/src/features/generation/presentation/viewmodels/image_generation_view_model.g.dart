@@ -42,7 +42,7 @@ final class ImageGenerationViewModelProvider
 }
 
 String _$imageGenerationViewModelHash() =>
-    r'b8a3e6c6ff70691193ad8d5b3e7ef1412aa925e2';
+    r'6ed0fa6ce7422bf28d2bf41970d0f1a0e78eb207';
 
 abstract class _$ImageGenerationViewModel extends $Notifier<ImageState> {
   ImageState build();

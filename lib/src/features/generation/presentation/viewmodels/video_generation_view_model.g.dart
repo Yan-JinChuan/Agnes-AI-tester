@@ -42,7 +42,7 @@ final class VideoGenerationViewModelProvider
 }
 
 String _$videoGenerationViewModelHash() =>
-    r'97803d262b955309628f391eee765bea10a92217';
+    r'e7e87a9b1102be8bb7d15633e3b9eab1fd8a08f2';
 
 abstract class _$VideoGenerationViewModel extends $Notifier<VideoState> {
   VideoState build();

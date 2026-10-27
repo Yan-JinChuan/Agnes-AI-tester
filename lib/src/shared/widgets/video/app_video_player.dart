@@ -88,6 +88,8 @@ class AppVideoPlayerController extends ChangeNotifier
   Future<void>? _seekDrain;
   bool _completionGuarded = false;
   Future<void>? _pauseAtEndFuture;
+  Future<void>? _suspension;
+  bool _resumePlaybackAfterSuspend = false;
   bool _disposed = false;
 
   @override
@@ -129,7 +131,7 @@ class AppVideoPlayerController extends ChangeNotifier
   Future<void> _initializeInternal() async {
     final operationToken = ++_operationToken;
     try {
-      await _initializeCachedPlayer();
+      await _initializeCachedPlayer(operationToken);
     } on Object catch (error) {
       if (_disposed || operationToken != _operationToken) return;
       await _releaseRealController();
@@ -141,8 +143,9 @@ class AppVideoPlayerController extends ChangeNotifier
     }
   }
 
-  Future<void> _initializeCachedPlayer() async {
+  Future<void> _initializeCachedPlayer(int operationToken) async {
     final cacheManager = await cache.videoCacheManager;
+    if (_disposed || operationToken != _operationToken) return;
     final cachedPlayer = CachedVideoPlayerPlus.networkUrl(
       remoteUri,
       httpHeaders: httpHeaders,
@@ -154,6 +157,11 @@ class AppVideoPlayerController extends ChangeNotifier
     _cachedPlayer = cachedPlayer;
     try {
       await cachedPlayer.initialize();
+      if (_disposed || operationToken != _operationToken) {
+        await cachedPlayer.dispose();
+        if (identical(_cachedPlayer, cachedPlayer)) _cachedPlayer = null;
+        return;
+      }
       final controller = cachedPlayer.controller;
       if (!_attachRealController(controller)) {
         await cachedPlayer.dispose();
@@ -201,6 +209,64 @@ class AppVideoPlayerController extends ChangeNotifier
       await cachedPlayer.dispose();
     } else {
       await realController?.dispose();
+    }
+  }
+
+  /// 释放后台或低内存场景下的原生视频资源。
+  ///
+  /// 磁盘缓存不在这里清理，避免恢复前台后重新下载同一视频；只释放
+  /// 当前平台控制器，并记住暂停前是否正在播放以便恢复时继续播放。
+  Future<void> suspendForLifecycle() {
+    if (_disposed) return Future<void>.value();
+    return _suspension ??= _suspendForLifecycleInternal().whenComplete(
+      () => _suspension = null,
+    );
+  }
+
+  Future<void> _suspendForLifecycleInternal() async {
+    // hidden -> paused 等连续通知可能让该方法被再次调用；只要任一
+    // 通知到达前播放器正在播放，就应该在恢复时保留这个用户意图。
+    _resumePlaybackAfterSuspend =
+        _resumePlaybackAfterSuspend || _value.isPlaying;
+    _operationToken++;
+
+    final initialization = _initialization;
+    if (initialization != null) {
+      try {
+        await initialization;
+      } catch (_) {
+        // 初始化失败的资源已经由初始化流程负责清理，暂停动作仍需继续。
+      }
+    }
+    final seekDrain = _seekDrain;
+    if (seekDrain != null) {
+      try {
+        await seekDrain;
+      } catch (_) {
+        // 平台控制器可能在低内存时先于 seek 完成被系统回收。
+      }
+    }
+    if (_disposed) return;
+    await _releaseRealController();
+    _completionGuarded = false;
+  }
+
+  /// 在应用恢复前台后重新创建原生控制器，并恢复暂停前的播放意图。
+  Future<void> resumeFromLifecycle() async {
+    final suspension = _suspension;
+    if (suspension != null) {
+      try {
+        await suspension;
+      } catch (_) {
+        // 释放失败不应阻止前台重新尝试初始化控制器。
+      }
+    }
+    if (_disposed || isInitialized || isInitializing) return;
+    final shouldResumePlayback = _resumePlaybackAfterSuspend;
+    _resumePlaybackAfterSuspend = false;
+    await initialize();
+    if (shouldResumePlayback && !_disposed && isInitialized) {
+      await play();
     }
   }
 

@@ -69,12 +69,40 @@ class ImageHistoryList extends StatelessWidget {
     required this.history,
     required this.cache,
     required this.onSelect,
+    required this.onDelete,
+    this.selectedRecord,
     super.key,
   });
 
   final List<ImageGenerationRecord> history;
   final AppMediaCache cache;
   final ValueChanged<ImageGenerationRecord> onSelect;
+  final Future<void> Function(ImageGenerationRecord) onDelete;
+  final ImageGenerationRecord? selectedRecord;
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    ImageGenerationRecord record,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('删除图片记录？'),
+        content: const Text('删除后只会移除本地历史记录，无法恢复。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await onDelete(record);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +121,9 @@ class ImageHistoryList extends StatelessWidget {
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final record = history[index];
+            final isSelected =
+                identical(selectedRecord, record) ||
+                (record.id != null && selectedRecord?.id == record.id);
             return Card(
               clipBehavior: Clip.antiAlias,
               child: InkWell(
@@ -126,7 +157,13 @@ class ImageHistoryList extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right),
+                      if (record.id != null)
+                        IconButton(
+                          tooltip: '删除记录',
+                          onPressed: () => _confirmDelete(context, record),
+                          icon: const Icon(Icons.delete_outline),
+                        ),
+                      Icon(isSelected ? Icons.expand_less : Icons.expand_more),
                     ],
                   ),
                 ),

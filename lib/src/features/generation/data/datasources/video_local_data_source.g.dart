@@ -55,4 +55,4 @@ final class VideoLocalDataSourceProvider
 }
 
 String _$videoLocalDataSourceHash() =>
-    r'bb51ef81611d7a13873b3fbfaed502acd02ccf77';
+    r'979fd5f8e1f90016a5b92d58f7f3a0ef8c380c23';

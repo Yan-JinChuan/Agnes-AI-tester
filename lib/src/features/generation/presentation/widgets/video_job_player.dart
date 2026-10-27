@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/cache/app_media_cache.dart';
+import '../../../../core/lifecycle/app_lifecycle_provider.dart';
 import '../../../../shared/widgets/video/app_video_player.dart';
 
 class VideoJobPlayer extends ConsumerStatefulWidget {
@@ -48,7 +49,9 @@ class _VideoJobPlayerState extends ConsumerState<VideoJobPlayer> {
       cacheKey: widget.cacheKey,
       cache: ref.read(appMediaCacheProvider),
     );
-    unawaited(_controller.initialize());
+    if (!ref.read(appLifecycleProvider).shouldSuspendResources) {
+      unawaited(_controller.initialize());
+    }
   }
 
   Future<void> _togglePlayback() async {
@@ -103,6 +106,22 @@ class _VideoJobPlayerState extends ConsumerState<VideoJobPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(appLifecycleProvider, (previous, next) {
+      final memoryPressureChanged =
+          previous != null &&
+          previous.memoryPressureRevision != next.memoryPressureRevision;
+      if (memoryPressureChanged) {
+        unawaited(_handleMemoryPressure());
+        return;
+      }
+      if (next.shouldSuspendResources) {
+        unawaited(_controller.suspendForLifecycle());
+      } else if (previous != null &&
+          previous.shouldSuspendResources &&
+          next.isResumed) {
+        unawaited(_controller.resumeFromLifecycle());
+      }
+    });
     return Column(
       children: [
         RepaintBoundary(child: AppVideoPlayer(controller: _controller)),
@@ -144,6 +163,12 @@ class _VideoJobPlayerState extends ConsumerState<VideoJobPlayer> {
         ),
       ],
     );
+  }
+
+  Future<void> _handleMemoryPressure() async {
+    await _controller.suspendForLifecycle();
+    if (!mounted || !ref.read(appLifecycleProvider).isResumed) return;
+    await _controller.resumeFromLifecycle();
   }
 }
 

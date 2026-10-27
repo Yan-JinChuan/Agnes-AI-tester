@@ -13,13 +13,8 @@ part of 'app_config_dao.dart';
 final appConfigDaoProvider = AppConfigDaoProvider._();
 
 final class AppConfigDaoProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<AppConfigDao>,
-          AppConfigDao,
-          FutureOr<AppConfigDao>
-        >
-    with $FutureModifier<AppConfigDao>, $FutureProvider<AppConfigDao> {
+    extends $FunctionalProvider<AppConfigDao, AppConfigDao, AppConfigDao>
+    with $Provider<AppConfigDao> {
   AppConfigDaoProvider._()
     : super(
         from: null,
@@ -36,14 +31,21 @@ final class AppConfigDaoProvider
 
   @$internal
   @override
-  $FutureProviderElement<AppConfigDao> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  $ProviderElement<AppConfigDao> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
-  FutureOr<AppConfigDao> create(Ref ref) {
+  AppConfigDao create(Ref ref) {
     return appConfigDao(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AppConfigDao value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppConfigDao>(value),
+    );
   }
 }
 
-String _$appConfigDaoHash() => r'8e342927746c248dba17ad81edb3ae48dc73a132';
+String _$appConfigDaoHash() => r'4253f47772456efd5eb4ac3413e9797d4e92e25b';

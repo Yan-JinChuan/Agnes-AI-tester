@@ -55,4 +55,4 @@ final class ImageLocalDataSourceProvider
 }
 
 String _$imageLocalDataSourceHash() =>
-    r'3b004309e13a4a39fd1c8ba226dbb5a4aeb00d68';
+    r'678accd93d78a45d947ff7ddaa1479892e4bc6ad';

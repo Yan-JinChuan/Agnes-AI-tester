@@ -6,6 +6,7 @@ import 'package:agnes_ai_tester/src/core/utils/error_message.dart';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../../core/lifecycle/app_lifecycle_provider.dart';
 import '../../data/di/generation_data_providers.dart';
 import '../../domain/models/video_generation_options.dart';
 import '../../domain/models/video_generation_record.dart';
@@ -60,13 +61,25 @@ extension VideoStateSelection on VideoState {
 class VideoGenerationViewModel extends _$VideoGenerationViewModel {
   late VideoRepository _repository;
   Timer? _pollTimer;
+  bool _resumeInFlight = false;
 
   @override
   VideoState build() {
     ref.listen(videoRepositoryProvider, (_, repository) {
       _repository = repository;
     }, fireImmediately: true);
-    ref.onDispose(() => _pollTimer?.cancel());
+    ref.listen(appLifecycleProvider, (previous, next) {
+      if (next.shouldSuspendResources) {
+        _stopPolling();
+        return;
+      }
+      if (next.isResumed &&
+          previous != null &&
+          previous.shouldSuspendResources) {
+        unawaited(refreshAfterResume());
+      }
+    }, fireImmediately: true);
+    ref.onDispose(_stopPolling);
     return const VideoState();
   }
 
@@ -159,10 +172,29 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
           break;
         }
       }
-      state = state.copyWith(history: history, job: active?.job);
+      // 恢复前台时优先保留用户当前展开的记录；如果该记录已经完成，
+      // 也不能因为刷新历史而突然收起详情卡片。
+      final selected = active ?? _recordWithVideoId(history, state.job?.id);
+      state = state.copyWith(history: history, job: selected?.job, error: null);
       if (active != null) _startPolling();
     } catch (error) {
       state = state.copyWith(error: readableErrorMessage(error));
+    }
+  }
+
+  /// 应用恢复前台后重新同步本地历史，并立即补偿一次远端状态查询。
+  ///
+  /// 后台期间操作系统可能暂停 Dart 定时器，恢复时不能依赖下一次
+  /// `Timer.periodic` 回调，否则用户需要额外等待一个轮询周期才能看到进度。
+  Future<void> refreshAfterResume() async {
+    if (_resumeInFlight) return;
+    _resumeInFlight = true;
+    try {
+      await loadHistory();
+      if (ref.read(appLifecycleProvider).shouldSuspendResources) return;
+      if (_hasRunningJobs) await _pollActiveJobs();
+    } finally {
+      _resumeInFlight = false;
     }
   }
 
@@ -331,7 +363,11 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
 
   Future<void> poll() async {
     final job = state.job;
-    if (job == null || state.isLoading || job.isCompleted || job.isFailed) {
+    if (job == null ||
+        state.isLoading ||
+        job.isCompleted ||
+        job.isFailed ||
+        ref.read(appLifecycleProvider).shouldSuspendResources) {
       return;
     }
     state = state.copyWith(isLoading: true, error: null);
@@ -358,8 +394,30 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
   void dismissError() => state = state.copyWith(error: null);
 
   void selectHistory(VideoGenerationRecord record) {
+    if (state.job?.id == record.videoId) {
+      state = state.copyWith(job: null, error: null);
+      return;
+    }
     state = state.copyWith(job: record.job, error: null);
     if (record.job.isRunning) _startPolling();
+  }
+
+  /// Deletes a persisted video and closes it when it is the visible task.
+  Future<void> deleteHistory(VideoGenerationRecord record) async {
+    try {
+      await _repository.delete(videoId: record.videoId);
+      final wasSelected = state.job?.id == record.videoId;
+      state = state.copyWith(
+        history: state.history
+            .where((item) => item.videoId != record.videoId)
+            .toList(),
+        job: wasSelected ? null : state.job,
+        error: null,
+      );
+      if (!_hasRunningJobs) _stopPolling();
+    } catch (error) {
+      state = state.copyWith(error: readableErrorMessage(error));
+    }
   }
 
   void _setValidationError(String message) {
@@ -367,8 +425,15 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
   }
 
   void _startPolling() {
-    if (_pollTimer != null) return;
+    if (_pollTimer != null ||
+        ref.read(appLifecycleProvider).shouldSuspendResources) {
+      return;
+    }
     _pollTimer = Timer.periodic(const Duration(seconds: 8), (_) {
+      if (ref.read(appLifecycleProvider).shouldSuspendResources) {
+        _stopPolling();
+        return;
+      }
       if (!_hasRunningJobs) {
         _stopPolling();
         return;
@@ -378,7 +443,11 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
   }
 
   Future<void> _pollActiveJobs() async {
-    if (state.isLoading) return;
+    if (state.isLoading ||
+        ref.read(appLifecycleProvider).shouldSuspendResources) {
+      _stopPolling();
+      return;
+    }
     final activeJobs = state.history
         .where((record) => record.job.isRunning)
         .toList();
@@ -423,5 +492,16 @@ class VideoGenerationViewModel extends _$VideoGenerationViewModel {
       updated,
       ...history.where((record) => record.videoId != updated.videoId),
     ];
+  }
+
+  VideoGenerationRecord? _recordWithVideoId(
+    List<VideoGenerationRecord> records,
+    String? videoId,
+  ) {
+    if (videoId == null) return null;
+    for (final record in records) {
+      if (record.videoId == videoId) return record;
+    }
+    return null;
   }
 }
