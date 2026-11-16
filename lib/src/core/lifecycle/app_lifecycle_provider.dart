@@ -1,25 +1,21 @@
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'app_lifecycle_provider.freezed.dart';
 part 'app_lifecycle_provider.g.dart';
 
 /// 描述应用当前生命周期和最近一次内存压力事件。
 ///
 /// 这个快照只表达资源管理所需的状态，不把导航、弹窗等 UI 行为带入
 /// core 层。业务 ViewModel 可以据此暂停轮询，媒体组件可以据此释放原生资源。
-class AppLifecycleSnapshot {
-  /// 创建生命周期快照。
-  const AppLifecycleSnapshot({
-    this.state = AppLifecycleState.detached,
-    this.memoryPressureRevision = 0,
-  });
-
+@freezed
+class const AppLifecycleSnapshot({
   /// Flutter 最近通知的生命周期状态。
-  final AppLifecycleState state;
-
+  final AppLifecycleState state = AppLifecycleState.detached,
   /// 每次收到低内存通知都会递增，用于让资源持有者消费一次性事件。
-  final int memoryPressureRevision;
-
+  final int memoryPressureRevision = 0,
+}) with _$AppLifecycleSnapshot {
   /// 当前是否已经回到前台可交互状态。
   bool get isResumed => state == AppLifecycleState.resumed;
 
@@ -36,18 +32,6 @@ class AppLifecycleSnapshot {
     AppLifecycleState.detached => true,
     _ => false,
   };
-
-  /// 创建一个只替换指定字段的新快照。
-  AppLifecycleSnapshot copyWith({
-    AppLifecycleState? state,
-    int? memoryPressureRevision,
-  }) {
-    return AppLifecycleSnapshot(
-      state: state ?? this.state,
-      memoryPressureRevision:
-          memoryPressureRevision ?? this.memoryPressureRevision,
-    );
-  }
 }
 
 /// 监听应用生命周期并广播资源管理事件。

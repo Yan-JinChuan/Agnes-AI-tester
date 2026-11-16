@@ -54,7 +54,7 @@ final class AppLifecycleNotifierProvider
 }
 
 String _$appLifecycleNotifierHash() =>
-    r'c3477b1426bf97c90ceaa691d0f93aba7d7a0dff';
+    r'885a978105d4a004522de18a8da08f176ec49333';
 
 /// 监听应用生命周期并广播资源管理事件。
 ///
