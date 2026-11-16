@@ -34,9 +34,15 @@ Agnes AI 测试台是一个用于在本地验证与调试 Agnes AI OpenAI 兼容
 
 ```text
 lib/src/
-├── app.dart                         MaterialApp.router 全局配置与应用入口
-├── app_shell.dart                   应用主框架壳：导航联动与设置入口
-├── routing/                         go_router 声明式路由表
+├── app/                             顶层组装与编排层
+│   ├── app.dart                     MyApp：MaterialApp.router 与启动守卫挂载
+│   ├── app_shell.dart                应用主框架壳：导航联动与设置入口
+│   ├── router/                       GoRouter 路由表与 NoTransitionPage
+│   │   ├── app_router.dart
+│   │   └── not_found_screen.dart     未匹配路由页面
+│   └── startup/                      启动 Provider 与启动过渡态
+│       ├── app_startup_provider.dart
+│       └── app_startup_widget.dart
 │
 ├── core/                            【纯技术基建底座】（无视觉 UI，零具体业务）
 │   ├── cache/                       AppMediaCache、视频边下边播本地代理服务 (Proxy)
@@ -91,6 +97,27 @@ lib/src/
 ```
 
 > **提示**：完整的架构禁令、各层调用规则及 AI 编码约束，请查阅根目录下的 **AGENTS.md**。
+
+### 顶层组装与启动编排
+
+- `lib/main.dart` 只负责 Flutter 绑定、平台能力注册和创建唯一的根 `ProviderScope`，不直接打开数据库或读取持久化配置。
+- `lib/src/app/app.dart` 中的 `MyApp` 负责组合主题、`MaterialApp.router` 和全局生命周期监听。
+- `MaterialApp.router.builder` 挂载 `AppStartupWidget`，统一处理数据库与配置恢复期间的 loading、错误、重试和成功状态。
+- `app_startup_provider.dart` 等待 `appDatabaseInitializationProvider` 完成后恢复配置；业务数据层继续通过同步的 `appDatabaseProvider` 获取连接。
+- `app/router/app_router.dart` 集中维护 `GoRouter`、命名路由和 `NoTransitionPage`，页面切换不在各业务页面中单独配置动画。
+
+启动数据流如下：
+
+```text
+main.dart
+  └── ProviderScope
+      └── MyApp (MaterialApp.router)
+          └── builder: AppStartupWidget
+              ├── appStartupProvider
+              │   ├── appDatabaseInitializationProvider
+              │   └── AppConfigDao / appConfigProvider.hydrate
+              └── router child（启动完成后显示）
+```
 
 ### 网络层与模型约定
 

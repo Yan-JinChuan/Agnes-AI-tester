@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'features/settings/presentation/views/connection_settings_dialog.dart';
-import 'features/settings/presentation/widgets/connection_status.dart';
+import '../features/settings/presentation/views/connection_settings_dialog.dart';
+import '../features/settings/presentation/widgets/connection_status.dart';
 
 class AppShell extends ConsumerWidget {
   const AppShell({required this.navigationShell, super.key});

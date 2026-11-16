@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'core/lifecycle/app_lifecycle_provider.dart';
-import 'routing/app_router.dart';
+import '../core/lifecycle/app_lifecycle_provider.dart';
+import 'router/app_router.dart';
+import 'startup/app_startup_widget.dart';
 
-class AgnesApp extends ConsumerWidget {
-  const AgnesApp({super.key});
+/// 应用顶层组装入口，负责组合主题、路由和启动过渡态。
+class MyApp extends ConsumerWidget {
+  /// 创建应用根组件。
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,6 +23,7 @@ class AgnesApp extends ConsumerWidget {
       title: 'Agnes AI 测试台',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
+      builder: (context, child) => AppStartupWidget(child: child),
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: scheme,

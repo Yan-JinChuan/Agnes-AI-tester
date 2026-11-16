@@ -1,20 +1,18 @@
-import 'package:agnes_ai_tester/src/core/config/app_config.dart';
-import 'package:agnes_ai_tester/src/core/config/app_config_provider.dart';
-import 'package:agnes_ai_tester/src/core/storage/app_config_dao.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fvp/fvp.dart' as fvp;
 
-import 'src/app.dart';
-import 'src/core/storage/app_database.dart';
+import 'src/app/app.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final db = await AppDatabase.open();
-  final dao = AppConfigDao(db.database);
-  final initialConfig = await dao.readConfig() ?? const AppConfig();
+  _registerFVP();
 
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+void _registerFVP() {
   fvp.registerWith(
     options: {
       // 持久化视频缓存由 CachedVideoPlayerPlus 统一管理，避免与 FVP
@@ -48,17 +46,5 @@ Future<void> main() async {
       // global 才是 FVP 传递 MDK 全局属性的入口。
       'global': {'log': kDebugMode ? 'info' : 'warning'},
     },
-  );
-
-  runApp(
-    ProviderScope(
-      overrides: [
-        appDatabaseProvider.overrideWithValue(db),
-        appConfigProvider.overrideWith(
-          () => AppConfigNotifier(initialConfig: initialConfig),
-        ),
-      ],
-      child: const AgnesApp(),
-    ),
   );
 }

@@ -13,6 +13,11 @@ class AppConfigNotifier extends _$AppConfigNotifier {
   @override
   AppConfig build() => initialConfig ?? const AppConfig();
 
+  /// 将启动阶段从 SQLite 恢复的配置写入内存状态，不重复写入数据库。
+  void hydrate(AppConfig config) {
+    state = config;
+  }
+
   Future<void> setConfig(AppConfig newConfig) async {
     state = newConfig;
     final dao = ref.read(appConfigDaoProvider);

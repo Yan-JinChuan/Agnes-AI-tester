@@ -1,8 +1,8 @@
 import 'package:go_router/go_router.dart';
 
-import '../features/chat/presentation/views/chat_view.dart';
-import '../features/generation/presentation/views/image_generation_view.dart';
-import '../features/generation/presentation/views/video_generation_view.dart';
+import '../../features/chat/presentation/views/chat_view.dart';
+import '../../features/generation/presentation/views/image_generation_view.dart';
+import '../../features/generation/presentation/views/video_generation_view.dart';
 import '../app_shell.dart';
 import 'not_found_screen.dart';
 
@@ -26,7 +26,8 @@ final appRouter = GoRouter(
             GoRoute(
               path: '/chat',
               name: AppRoute.chat,
-              builder: (context, state) => const ChatView(),
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: ChatView()),
             ),
           ],
         ),
@@ -35,7 +36,8 @@ final appRouter = GoRouter(
             GoRoute(
               path: '/image',
               name: AppRoute.image,
-              builder: (context, state) => const ImageGenerationView(),
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: ImageGenerationView()),
             ),
           ],
         ),
@@ -44,7 +46,8 @@ final appRouter = GoRouter(
             GoRoute(
               path: '/video',
               name: AppRoute.video,
-              builder: (context, state) => const VideoGenerationView(),
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: VideoGenerationView()),
             ),
           ],
         ),

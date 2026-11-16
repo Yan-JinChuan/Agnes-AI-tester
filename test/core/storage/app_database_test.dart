@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:agnes_ai_tester/src/core/storage/app_database.dart';
 
@@ -28,4 +29,27 @@ void main() {
       ]),
     );
   });
+
+  test(
+    'synchronous database provider reuses the initialized instance',
+    () async {
+      final database = await AppDatabase.open(databasePath: ':memory:');
+      final container = ProviderContainer(
+        overrides: [
+          appDatabaseInitializationProvider.overrideWith(
+            (ref) async => database,
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      addTearDown(database.close);
+
+      final initialized = await container.read(
+        appDatabaseInitializationProvider.future,
+      );
+      final synchronous = container.read(appDatabaseProvider);
+
+      expect(identical(initialized, synchronous), isTrue);
+    },
+  );
 }

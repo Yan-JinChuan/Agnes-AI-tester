@@ -25,10 +25,20 @@
 
 ## 2. 目录分层与职责边界
 
-工程骨架由 **`core`（技术底座）**、**`shared`（通用公共资产）** 与 **`features`（业务特性）** 构成：
+工程骨架由 **`app`（顶层组装与编排）**、**`core`（技术底座）**、**`shared`（通用公共资产）** 与 **`features`（业务特性）** 构成：
 
 ```text
 lib/src/
+├── app/                             # 顶层组装与编排层（组合根）
+│   ├── app.dart                     # MyApp：MaterialApp.router 与 builder 启动守卫
+│   ├── app_shell.dart                # 全局应用壳与导航容器
+│   ├── router/                       # GoRouter 与无动画路由页面
+│   │   ├── app_router.dart            # GoRouter、命名路由、NoTransitionPage
+│   │   └── not_found_screen.dart     # 路由错误页面
+│   └── startup/                      # 启动 Provider 与启动过渡态
+│       ├── app_startup_provider.dart
+│       └── app_startup_widget.dart
+
 ├── core/                            # 基础设施：纯技术底层驱动（零视觉 UI，零业务）
 │   ├── cache/                       # 媒体磁盘缓存管理、视频边下边播本地代理服务 (Proxy)
 │   ├── config/                      # 运行时全局配置 (AppConfig) 与常驻内存状态
@@ -61,12 +71,20 @@ lib/src/
 ### 2.1 依赖关系法则（单向漏斗）
 
 ```text
-[ features/ (业务模块) ] ──> 依赖 ──> [ shared/ (公共 UI 资产) ] ──> 依赖 ──> [ core/ (底层技术底座) ]
+[ app/ (顶层组合根) ] ──> 组合 ──> [ features/ (业务模块) ] ──> 依赖 ──> [ shared/ (公共 UI 资产) ] ──> 依赖 ──> [ core/ (底层技术底座) ]
 ```
 
-1. **core/ 是最底层**：绝对不可 import shared/ 或 features/。
-2. **shared/ 是通用积木**：只依赖 core/ 和 Flutter SDK；**严禁导入任何 features/**（即 shared/ 不得出现任何具体的业务模型、DTO 或 ViewModel）。
-3. **features/ 是消费方**：可自由组合使用 shared/ 的组件和 core/ 的能力。
+1. **app/ 是唯一的顶层组合根**：负责装配 `MyApp`、`GoRouter`、`AppShell` 和启动守卫；业务模块不得反向 import `app/`。
+2. **core/ 是最底层**：绝对不可 import app/、shared/ 或 features/。
+3. **shared/ 是通用积木**：只依赖 core/ 和 Flutter SDK；**严禁导入任何 features/**（即 shared/ 不得出现任何具体的业务模型、DTO 或 ViewModel）。
+4. **features/ 是业务消费方**：可组合使用 shared/ 与 core/ 的能力，但页面导航仍通过 app 层提供的集中路由配置完成。
+
+### 2.1.1 顶层启动与路由约束
+
+- `main.dart` 不得直接执行数据库打开、配置读取等耗时初始化；这些动作必须由 `app/startup/app_startup_provider.dart` 编排。
+- `MyApp` 必须在 `MaterialApp.router.builder` 中挂载 `AppStartupWidget`，不得通过第二个 `ProviderScope` 包裹启动页。
+- `app/router/app_router.dart` 是 GoRouter 的唯一集中配置入口，页面路由使用 `NoTransitionPage` 统一关闭页面切换动画。
+- 路由守卫只负责组装和渲染边界；业务状态判断、数据库读取和网络请求不得写入 `app/router/app_router.dart`。
 
 ### 2.2 模块内部 DTO 与 Domain 隔离
 

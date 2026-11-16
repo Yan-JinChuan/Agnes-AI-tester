@@ -26,4 +26,18 @@ void main() {
       initialConfig.copyWith(baseUrl: 'https://example.test/v1'),
     );
   });
+
+  test('hydrates the persisted config without writing it again', () {
+    const persisted = AppConfig(
+      apiKey: 'stored-key',
+      baseUrl: 'https://stored.example/v1',
+    );
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final notifier = container.read(appConfigProvider.notifier);
+    notifier.hydrate(persisted);
+
+    expect(container.read(appConfigProvider), persisted);
+  });
 }

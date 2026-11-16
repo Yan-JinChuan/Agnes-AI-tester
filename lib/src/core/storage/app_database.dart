@@ -19,16 +19,21 @@ abstract class DataBaseTableNames {
       "idx_video_generations_updated";
 }
 
-/// 提供应用级数据库依赖的注入入口。
+/// 异步打开并持有应用唯一的 SQLite 连接。
 ///
-/// 数据库必须由应用组合根（`main()`）完成异步打开后通过 override 注入，
-/// 这样数据源在创建时拿到的就是可直接使用的连接，而不会把初始化等待
-/// 泄漏到每一次 SQL 操作中。
+/// 启动编排通过 `.future` 等待初始化完成；业务数据源不要直接等待，
+/// 应继续使用下面的同步 [appDatabaseProvider]。
+@Riverpod(keepAlive: true)
+Future<AppDatabase> appDatabaseInitialization(Ref ref) async {
+  final db = await AppDatabase.open();
+  ref.onDispose(() => db.close());
+  return db;
+}
+
+/// 将已完成的异步数据库连接截断为同步依赖。
 @Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {
-  throw StateError(
-    'AppDatabase 尚未初始化，请在 ProviderScope 中覆盖 appDatabaseProvider。',
-  );
+  return ref.watch(appDatabaseInitializationProvider).requireValue;
 }
 
 class AppDatabase {

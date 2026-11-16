@@ -7,7 +7,8 @@ import 'package:agnes_ai_tester/src/core/cache/media_cache_repository.dart';
 import 'package:agnes_ai_tester/src/core/cache/media_cache_repository_provider.dart';
 import 'package:agnes_ai_tester/src/core/config/app_config.dart';
 import 'package:agnes_ai_tester/src/core/config/app_config_provider.dart';
-import 'package:agnes_ai_tester/src/app.dart';
+import 'package:agnes_ai_tester/src/app/app.dart';
+import 'package:agnes_ai_tester/src/app/startup/app_startup_provider.dart';
 import 'package:agnes_ai_tester/src/features/chat/data/di/chat_data_providers.dart';
 import 'package:agnes_ai_tester/src/features/chat/domain/models/chat_message.dart';
 import 'package:agnes_ai_tester/src/features/chat/domain/models/conversation_summary.dart';
@@ -113,12 +114,14 @@ Future<void> _pumpAgnesApp(
     chatRepositoryProvider.overrideWithValue(_FakeChatRepository()),
     imageRepositoryProvider.overrideWithValue(_FakeImageRepository()),
     videoRepositoryProvider.overrideWithValue(_FakeVideoRepository()),
+    appStartupProvider.overrideWith((ref) async {}),
     if (cacheRepository != null)
       mediaCacheRepositoryProvider.overrideWithValue(cacheRepository),
   ];
   await tester.pumpWidget(
-    ProviderScope(overrides: overrides, child: const AgnesApp()),
+    ProviderScope(overrides: overrides, child: const MyApp()),
   );
+  await tester.pumpAndSettle();
 }
 
 class _FakeChatRepository implements ChatRepository {
