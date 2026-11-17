@@ -1,31 +1,27 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/native.dart';
 
 import 'package:agnes_ai_tester/src/core/storage/app_database.dart';
 
 void main() {
   test('opens one database instance with the complete schema', () async {
-    final database = await AppDatabase.open(databasePath: ':memory:');
+    final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);
 
-    expect(database.database.isOpen, isTrue);
-
-    final rows = await database.database.rawQuery(
-      "SELECT name FROM sqlite_master WHERE type = 'table'",
-    );
-    final tableNames = rows
-        .map((row) => row['name'])
-        .whereType<String>()
-        .toSet();
+    final rows = await database
+        .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
+        .get();
+    final tableNames = rows.map((row) => row.read<String>('name')).toSet();
 
     expect(
       tableNames,
       containsAll(<String>[
-        DataBaseTableNames.settings,
-        DataBaseTableNames.conversations,
-        DataBaseTableNames.messages,
-        DataBaseTableNames.imageGenerations,
-        DataBaseTableNames.videoGenerations,
+        'settings',
+        'conversations',
+        'messages',
+        'image_generations',
+        'video_generations',
       ]),
     );
   });
@@ -33,7 +29,7 @@ void main() {
   test(
     'synchronous database provider reuses the initialized instance',
     () async {
-      final database = await AppDatabase.open(databasePath: ':memory:');
+      final database = AppDatabase(NativeDatabase.memory());
       final container = ProviderContainer(
         overrides: [
           appDatabaseInitializationProvider.overrideWith(

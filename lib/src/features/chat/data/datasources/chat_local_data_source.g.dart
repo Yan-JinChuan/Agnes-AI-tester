@@ -8,9 +8,12 @@ part of 'chat_local_data_source.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// 提供聊天本地数据源，并复用应用唯一的 Drift 数据库。
 
 @ProviderFor(chatLocalDataSource)
 final chatLocalDataSourceProvider = ChatLocalDataSourceProvider._();
+
+/// 提供聊天本地数据源，并复用应用唯一的 Drift 数据库。
 
 final class ChatLocalDataSourceProvider
     extends
@@ -20,6 +23,7 @@ final class ChatLocalDataSourceProvider
           ChatLocalDataSource
         >
     with $Provider<ChatLocalDataSource> {
+  /// 提供聊天本地数据源，并复用应用唯一的 Drift 数据库。
   ChatLocalDataSourceProvider._()
     : super(
         from: null,
@@ -55,4 +59,4 @@ final class ChatLocalDataSourceProvider
 }
 
 String _$chatLocalDataSourceHash() =>
-    r'113945d8fef4e274d0d3a67888ce593b9e433a9d';
+    r'f731f5291293a00c11fc6e1ee1a3b46dacd7f9b6';

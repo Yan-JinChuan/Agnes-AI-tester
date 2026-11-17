@@ -1,7 +1,8 @@
-import 'dart:typed_data';
+import 'package:drift/drift.dart' show Value;
 
 import '../../../../core/cache/app_media_cache.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/storage/app_database.dart';
 import '../../domain/models/image_generation_record.dart';
 import '../../domain/models/image_generation_result.dart';
 import '../../domain/repositories/image_repository.dart';
@@ -9,6 +10,7 @@ import '../datasources/image_local_data_source.dart';
 import '../datasources/image_remote_data_source.dart';
 import '../models/image_api_models.dart';
 
+/// 协调图片生成接口、本地历史与媒体缓存，并负责数据库行到领域实体的转换。
 class ImageRepositoryImpl implements ImageRepository {
   const ImageRepositoryImpl({
     required this.remote,
@@ -22,12 +24,14 @@ class ImageRepositoryImpl implements ImageRepository {
   final String model;
   final AppMediaCache cache;
 
+  /// 读取本地图片历史并转换为领域记录。
   @override
   Future<List<ImageGenerationRecord>> history() async {
     final rows = await local.loadHistory();
     return rows.map(_fromRow).toList();
   }
 
+  /// 生成图片、缓存可用媒体并持久化本地历史。
   @override
   Future<ImageGenerationRecord> generate({
     required String prompt,
@@ -58,11 +62,13 @@ class ImageRepositoryImpl implements ImageRepository {
     return record.copyWith(id: id);
   }
 
+  /// 删除指定本地历史记录。
   @override
   Future<void> delete({required int id}) {
     return local.deleteGeneration(id: id);
   }
 
+  /// 在 Repository 边界把远程 DTO 清洗为图片领域结果。
   ImageGenerationResult _toDomain(ImageData data) {
     try {
       return data.toDomain();
@@ -71,6 +77,7 @@ class ImageRepositoryImpl implements ImageRepository {
     }
   }
 
+  /// 尽力填充媒体缓存；缓存故障不应抹掉已经成功生成的结果。
   Future<void> _cacheResult(ImageGenerationResult result, String prompt) async {
     try {
       if (result.url != null && result.url!.isNotEmpty) {
@@ -82,39 +89,34 @@ class ImageRepositoryImpl implements ImageRepository {
         );
       }
     } on Object {
-      // The database keeps the original result, so a cache failure must not
-      // turn a successful Agnes generation into an application error.
+      // 生成结果已可持久化；缓存异常不应把成功的 Agnes 响应改成失败。
     }
   }
 
-  ImageGenerationRecord _fromRow(Map<String, Object?> row) {
-    final rawBytes = row['image_bytes'];
-    final bytes = rawBytes is Uint8List
-        ? rawBytes
-        : rawBytes is List<int>
-        ? Uint8List.fromList(rawBytes)
-        : null;
+  /// 将 Drift 图片行还原为领域记录。
+  ImageGenerationRecord _fromRow(ImageGenerationRow row) {
     return ImageGenerationRecord(
-      id: row['id'] as int?,
-      prompt: row['prompt'] as String? ?? '',
-      model: row['model'] as String? ?? '',
-      size: row['size'] as String? ?? '',
+      id: row.id,
+      prompt: row.prompt,
+      model: row.model,
+      size: row.size,
       result: ImageGenerationResult(
-        url: (row['url'] as String?)?.trim(),
-        bytes: bytes,
+        url: row.url?.trim(),
+        bytes: row.imageBytes,
       ),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
     );
   }
 
-  Map<String, Object?> _toRow(ImageGenerationRecord record) {
-    return {
-      'prompt': record.prompt,
-      'model': record.model,
-      'size': record.size,
-      'url': record.result.url,
-      'image_bytes': record.result.bytes,
-      'created_at': record.createdAt.millisecondsSinceEpoch,
-    };
+  /// 将领域记录映射为 Drift companion，显式表达可空列的写入值。
+  ImageGenerationsCompanion _toRow(ImageGenerationRecord record) {
+    return ImageGenerationsCompanion.insert(
+      prompt: record.prompt,
+      model: record.model,
+      size: record.size,
+      url: Value(record.result.url),
+      imageBytes: Value(record.result.bytes),
+      createdAt: record.createdAt.millisecondsSinceEpoch,
+    );
   }
 }

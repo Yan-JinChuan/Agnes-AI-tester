@@ -18,13 +18,17 @@ Agnes AI 测试台是一个用于在本地验证与调试 Agnes AI OpenAI 兼容
 ## 技术栈与现代语言特性
 
 - **Flutter / Dart**（全面采用 Dart 3.13+ 语言特性，包括原生主构造函数 Primary Constructors）
-- **状态管理**：`flutter_riverpod` + `riverpod_annotation` + `riverpod_generator`（类型安全的响应式状态管理）
-- **不可变模型**：`freezed` + `json_serializable`（**全面使用 Dart 3.13+ 主构造函数新语法**）
-- **网络通信**：`dio` + `retrofit` + `retrofit_generator`（声明式 REST 客户端与统一异常归一化）
-- **本地数据库**：`sqflite`（跨平台 SQLite 持久化）
+- **状态管理**：`flutter_riverpod` + `riverpod_annotation`（类型安全的响应式状态管理）
+- **不可变模型与 JSON 注解**：`freezed_annotation` + `json_annotation`（**全面使用 Dart 3.13+ 主构造函数新语法**）
+- **网络通信**：`dio` + `retrofit`（声明式 REST 客户端与统一异常归一化）
+- **本地数据库**：`drift` + `drift_flutter`（类型化查询与跨平台 SQLite 持久化）
+- **文件管理**：`path`、`path_provider`、`file`、`file_picker`
+- **缓存管理**：`flutter_cache_manager`
 - **声明式路由**：`go_router`（路由注册与导航切换）
-- **媒体播放**：`video_player` + `cached_video_player_plus`
-- **代码生成器**：`build_runner`
+- **媒体播放**：`video_player`、`cached_video_player_plus`、`video_player_win`、`fvp`
+- **开发期工具与代码生成**：`flutter_test`、`flutter_lints`、`build_runner`、`drift_dev`、`freezed`、`json_serializable`、`retrofit_generator`、`riverpod_generator`（均位于 `dev_dependencies`）
+
+应用业务数据通过 Drift 访问 SQLite。锁文件中仍可能因 `flutter_cache_manager` 自身的缓存索引出现传递依赖 `sqflite`。
 
 ---
 
@@ -48,7 +52,7 @@ lib/src/
 │   ├── cache/                       AppMediaCache、视频边下边播本地代理服务 (Proxy)
 │   ├── config/                      运行时全局配置 (AppConfig) 与常驻内存状态
 │   ├── network/                     DioApiClient、全局拦截器与统一网络异常
-│   └── storage/                     SQLite 数据库工厂与迁移 (AppDatabase)、DAO
+│   └── storage/                     Drift 数据库连接、Schema 与迁移 (AppDatabase)、DAO
 │
 ├── shared/                          【跨功能公共资产】（零业务感知，高复用积木）
 │   ├── theme/                       全局主题系统 (AppColors, AppTextStyles)
@@ -87,7 +91,7 @@ lib/src/
        ▼
 [ Repository (Data Coordination) ]
        ├── 3. 访问网络 ──> [ RemoteDataSource (Retrofit/Dio) ]
-       └── 3. 访问本地 ──> [ LocalDataSource (SQLite Database) ]
+       └── 3. 访问本地 ──> [ LocalDataSource (Drift / SQLite) ]
        │
        ▼ 4. 将网络 DTO 转换为纯业务 Domain Entity
 [ ViewModel ]
@@ -142,11 +146,11 @@ main.dart
 3. **分层数据防腐**：
 
    - **RemoteDataSource**：只负责与 Retrofit API 交互，**输入输出严格限制为 DTO**，不感知 Domain 模型。
-   - **RepositoryImpl**：充当防腐隔离墙，统一调用 DTO 的 `toDomain()` / `fromDomain()` 完成业务实体转换，并协调本地 SQLite 缓存。
-   - **表现层隔离**：ViewModel 与 View 绝不接触 Dio Response、SQLite Database 或原始 Map。
+   - **RepositoryImpl**：充当防腐隔离墙，统一调用 DTO 的 `toDomain()` / `fromDomain()` 完成业务实体转换，并协调本地 Drift 缓存。
+   - **表现层隔离**：ViewModel 与 View 绝不接触 Dio Response、Drift Database 或原始 Map。
 
 4. **数据库职责收敛**：
-   `AppDatabase` 仅负责数据库连接生命周期、多平台路径计算与版本迁移。具体的业务 CRUD SQL 严格隔离在各 feature 的 `*_local_data_source.dart` 中。
+   `AppDatabase` 仅负责 Drift 数据库连接生命周期、Schema、多平台路径计算与版本迁移。具体的类型化 CRUD 查询严格隔离在各 feature 的 `*_local_data_source.dart` 中；SQLite 是底层存储格式。
 
 ---
 
@@ -166,7 +170,7 @@ fvm flutter run
 
 ### 2. 代码生成与静态校验
 
-当修改了带有 `@riverpod`、`@freezed`、`@RestApi` 或 `@JsonSerializable` 注解的文件后，必须运行 build_runner 生成代码：
+当修改了带有 `@riverpod`、`@freezed`、`@DriftDatabase`、`@RestApi` 或 `@JsonSerializable` 注解的文件后，必须运行 build_runner 生成代码：
 
 ```bash
 # 执行代码生成并覆盖冲突

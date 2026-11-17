@@ -13,8 +13,8 @@
 | **在 ViewModel 中导入 `package:flutter/material.dart`** | ViewModel 必须是纯 Dart 逻辑，保持单测独立性。如需注解可导入 `meta` 或 `foundation`。                        |
 | **`shared/` 中导入或耦合任何 `features/` 代码**               | `shared/` 属于纯通用视觉资产，**严禁感知任何 Feature 业务概念**；全工程严格遵守 `features ➔ shared ➔ core` 单向依赖。 |
 | **在 `core/` 中编写具体的视觉 UI 控件**                        | `core/` 必须保持为纯技术基建底座（网络、数据库、代理、缓存引擎）；公共 UI 组件统一收敛至 `shared/widgets/`。                |
-| **View 跨层直接调用 Dio、SQLite 或 Repository**             | View 只能通过 `ref.watch` / `ref.read` 与当前特性的 **ViewModel** 交互。                          |
-| **ViewModel 跨层直接调用 Dio、ApiClient 或 SQLite**         | ViewModel 只能面向 **Repository 抽象接口**编程，绝不能直连底层数据源。                                     |
+| **View 跨层直接调用 Dio、Drift/SQLite 或 Repository**       | View 只能通过 `ref.watch` / `ref.read` 与当前特性的 **ViewModel** 交互。                          |
+| **ViewModel 跨层直接调用 Dio、ApiClient 或 Drift/SQLite**   | ViewModel 只能面向 **Repository 抽象接口**编程，绝不能直连底层数据源。                                     |
 | **使用 Freezed 旧版工厂构造函数写法**                           | **必须使用 Dart 3.13+ 原生主构造函数（Primary Constructor）** 定义不可变状态与模型。                         |
 | **在 View 中使用 `Timer` 轮询视频/接口状态**                    | 轮询、重试与数据状态合并属于 **ViewModel / Repository** 的职责，View 只负责渲染状态。                          |
 | **手动修改 `*.g.dart` 或 `*.freezed.dart` 文件**           | 严禁手工修改生成文件。必须修改注解源文件并通过 `build_runner` 重新构建。                                         |
@@ -43,7 +43,7 @@ lib/src/
 │   ├── cache/                       # 媒体磁盘缓存管理、视频边下边播本地代理服务 (Proxy)
 │   ├── config/                      # 运行时全局配置 (AppConfig) 与常驻内存状态
 │   ├── network/                     # DioApiClient、全局拦截器、统一异常
-│   └── storage/                     # SQLite 底座工厂 (AppDatabase)、AppConfigDao
+│   └── storage/                     # Drift 数据库连接、Schema 与迁移 (AppDatabase)、DAO
 │
 ├── shared/                          # 跨功能共享层：零业务概念的通用视觉积木
 │   ├── theme/                       # 设计系统规范 (AppColors, AppTextStyles)
@@ -54,11 +54,11 @@ lib/src/
 │
 └── features/<feature>/              # 业务特性模块 (Feature-First)
     ├── data/
-    │   ├── datasources/             # Retrofit API、RemoteDataSource、LocalDataSource (SQLite)
+    │   ├── datasources/             # Retrofit API、RemoteDataSource、LocalDataSource (Drift)
     │   ├── models/                  # DTO 网络模型 (Freezed + fromJson)
     │   ├── repositories/            # Repository 抽象接口的具体实现类 (*_impl.dart)
     │   └── di/                      # 模块装配组合根 (暴露 RepositoryProvider)
-    ├── domain/                      # 纯 Dart 业务核心 (零 Flutter、Dio、SQLite 依赖)
+    ├── domain/                      # 纯 Dart 业务核心 (零 Flutter、Dio、Drift/SQLite 依赖)
     │   ├── models/                  # 业务领域实体 (Domain Entity) 与业务枚举
     │   └── repositories/            # 仓库抽象契约接口 (abstract interface class)
     └── presentation/                # 表现层 (MVVM)
@@ -241,7 +241,7 @@ class ExampleRepositoryImpl implements ExampleRepository {
 
 ## 6. 开发与构建指令
 
-代码变更涉及注解时，必须按序执行：
+代码变更涉及 `@riverpod`、`@freezed`、`@DriftDatabase`、`@RestApi`、`@JsonSerializable` 等注解时，必须按序执行：
 
 ```bash
 # 1. 重新生成代码

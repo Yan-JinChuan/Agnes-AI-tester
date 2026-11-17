@@ -18,17 +18,18 @@ class AppStartupWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final startup = ref.watch(appStartupProvider);
-    return startup.when(
-      loading: () => const _AppStartupLoadingView(),
-      error: (error, stackTrace) => _AppStartupErrorView(
+
+    return switch (startup) {
+      AsyncLoading<void>() => const _AppStartupLoadingView(),
+      AsyncData<void>() => child ?? const SizedBox.shrink(),
+      AsyncError<void>(:final error) => _AppStartupErrorView(
         error: error,
         onRetry: () {
           ref.invalidate(appDatabaseInitializationProvider);
           ref.invalidate(appStartupProvider);
         },
       ),
-      data: (_) => child ?? const SizedBox.shrink(),
-    );
+    };
   }
 }
 

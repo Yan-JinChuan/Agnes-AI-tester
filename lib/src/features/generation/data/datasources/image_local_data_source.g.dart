@@ -8,9 +8,12 @@ part of 'image_local_data_source.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// 提供图片历史数据源，并复用应用唯一的 Drift 数据库。
 
 @ProviderFor(imageLocalDataSource)
 final imageLocalDataSourceProvider = ImageLocalDataSourceProvider._();
+
+/// 提供图片历史数据源，并复用应用唯一的 Drift 数据库。
 
 final class ImageLocalDataSourceProvider
     extends
@@ -20,6 +23,7 @@ final class ImageLocalDataSourceProvider
           ImageLocalDataSource
         >
     with $Provider<ImageLocalDataSource> {
+  /// 提供图片历史数据源，并复用应用唯一的 Drift 数据库。
   ImageLocalDataSourceProvider._()
     : super(
         from: null,
@@ -55,4 +59,4 @@ final class ImageLocalDataSourceProvider
 }
 
 String _$imageLocalDataSourceHash() =>
-    r'678accd93d78a45d947ff7ddaa1479892e4bc6ad';
+    r'1407a7d6b8b40cfd28345ae54d8e555836d5d442';

@@ -48,4 +48,4 @@ final class AppConfigDaoProvider
   }
 }
 
-String _$appConfigDaoHash() => r'4253f47772456efd5eb4ac3413e9797d4e92e25b';
+String _$appConfigDaoHash() => r'dab686559a49e093684ee675231b6f92d4353bca';

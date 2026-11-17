@@ -1,6 +1,7 @@
 import 'package:agnes_ai_tester/src/features/generation/domain/models/video_generation_options.dart';
 import 'package:agnes_ai_tester/src/features/generation/domain/models/video_generation_record.dart';
 import 'package:agnes_ai_tester/src/features/generation/domain/models/video_job_status.dart';
+import 'package:agnes_ai_tester/src/core/storage/app_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -181,21 +182,20 @@ class _UnusedVideoRemote implements VideoRemoteDataSource {
 
 class _UnusedVideoLocal implements VideoLocalDataSource {
   @override
-  Future<List<Map<String, Object?>>> loadHistory() =>
+  Future<List<VideoGenerationRow>> loadHistory() => throw UnimplementedError();
+
+  @override
+  Future<VideoGenerationRow?> findByVideoId(String videoId) =>
       throw UnimplementedError();
 
   @override
-  Future<Map<String, Object?>?> findByVideoId(String videoId) =>
-      throw UnimplementedError();
-
-  @override
-  Future<int> insertGeneration(Map<String, Object?> values) =>
+  Future<int> insertGeneration(VideoGenerationsCompanion values) =>
       throw UnimplementedError();
 
   @override
   Future<void> updateGeneration({
     required String videoId,
-    required Map<String, Object?> values,
+    required VideoGenerationsCompanion values,
   }) => throw UnimplementedError();
 
   @override

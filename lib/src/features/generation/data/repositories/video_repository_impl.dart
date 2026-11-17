@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart' show Value;
+
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/storage/app_database.dart';
 import '../../domain/models/video_generation_options.dart';
 import '../../domain/models/video_generation_record.dart';
 import '../../domain/models/video_job.dart';
@@ -10,6 +13,7 @@ import '../datasources/video_local_data_source.dart';
 import '../datasources/video_remote_data_source.dart';
 import '../models/video_api_models.dart';
 
+/// 协调视频接口与本地历史，并在 Repository 边界转换 DTO、Drift 行和领域记录。
 class VideoRepositoryImpl implements VideoRepository {
   const VideoRepositoryImpl({
     required this.remote,
@@ -21,12 +25,14 @@ class VideoRepositoryImpl implements VideoRepository {
   final VideoLocalDataSource local;
   final String model;
 
+  /// 读取视频历史并恢复为领域记录。
   @override
   Future<List<VideoGenerationRecord>> history() async {
     final rows = await local.loadHistory();
     return rows.map(_fromRow).toList();
   }
 
+  /// 提交视频任务并保存完整请求选项与初始状态。
   @override
   Future<VideoGenerationRecord> create({
     required String prompt,
@@ -60,6 +66,7 @@ class VideoRepositoryImpl implements VideoRepository {
     return record;
   }
 
+  /// 查询任务状态，并插入或更新相应的本地记录。
   @override
   Future<VideoGenerationRecord> poll({required String videoId}) async {
     final existingRow = await local.findByVideoId(videoId);
@@ -91,11 +98,13 @@ class VideoRepositoryImpl implements VideoRepository {
     return record;
   }
 
+  /// 删除指定视频任务对应的本地历史。
   @override
   Future<void> delete({required String videoId}) {
     return local.deleteGeneration(videoId: videoId);
   }
 
+  /// 在 Repository 边界把远程 DTO 清洗为领域任务。
   VideoJob _toDomain(VideoJobResponse response, {String? fallbackId}) {
     try {
       return response.toDomain(fallbackId: fallbackId);
@@ -104,43 +113,46 @@ class VideoRepositoryImpl implements VideoRepository {
     }
   }
 
-  VideoGenerationRecord _fromRow(Map<String, Object?> row) {
+  /// 将 Drift 视频行还原为领域记录及其请求选项。
+  VideoGenerationRecord _fromRow(VideoGenerationRow row) {
     return VideoGenerationRecord(
-      id: row['id'] as int?,
-      videoId: row['video_id'] as String,
-      prompt: row['prompt'] as String? ?? '',
-      model: row['model'] as String? ?? '',
-      options: _optionsFromStorage(row['request_json'] as String?),
-      status: VideoJobStatus.fromWireValue(row['status']),
-      progress: (row['progress'] as int? ?? 0).clamp(0, 100),
-      url: (row['url'] as String?)?.trim(),
-      error: (row['error'] as String?)?.trim(),
-      actualSize: (row['actual_size'] as String?)?.trim(),
-      seconds: _nullableDouble(row['seconds']),
-      metadataMessage: (row['metadata_message'] as String?)?.trim(),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row['created_at'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(row['updated_at'] as int),
+      id: row.id,
+      videoId: row.videoId,
+      prompt: row.prompt,
+      model: row.model,
+      options: _optionsFromStorage(row.requestJson),
+      status: VideoJobStatus.fromWireValue(row.status),
+      progress: row.progress.clamp(0, 100),
+      url: row.url?.trim(),
+      error: row.error?.trim(),
+      actualSize: row.actualSize?.trim(),
+      seconds: row.seconds,
+      metadataMessage: row.metadataMessage?.trim(),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
   }
 
-  Map<String, Object?> _toRow(VideoGenerationRecord record) {
-    return {
-      'video_id': record.videoId,
-      'prompt': record.prompt,
-      'model': record.model,
-      'request_json': jsonEncode(_optionsToStorage(record.options)),
-      'status': record.status.wireValue,
-      'progress': record.progress,
-      'url': record.url,
-      'error': record.error,
-      'actual_size': record.actualSize,
-      'seconds': record.seconds,
-      'metadata_message': record.metadataMessage,
-      'created_at': record.createdAt.millisecondsSinceEpoch,
-      'updated_at': record.updatedAt.millisecondsSinceEpoch,
-    };
+  /// 将领域记录映射为 Drift companion，供新增和更新共用。
+  VideoGenerationsCompanion _toRow(VideoGenerationRecord record) {
+    return VideoGenerationsCompanion.insert(
+      videoId: record.videoId,
+      prompt: record.prompt,
+      model: record.model,
+      status: record.status.wireValue,
+      progress: Value(record.progress),
+      url: Value(record.url),
+      error: Value(record.error),
+      requestJson: Value(jsonEncode(_optionsToStorage(record.options))),
+      actualSize: Value(record.actualSize),
+      seconds: Value(record.seconds),
+      metadataMessage: Value(record.metadataMessage),
+      createdAt: record.createdAt.millisecondsSinceEpoch,
+      updatedAt: record.updatedAt.millisecondsSinceEpoch,
+    );
   }
 
+  /// 将请求选项转换为稳定的 JSON 字段，供历史记录持久化。
   Map<String, Object?> _optionsToStorage(VideoGenerationOptions options) {
     return {
       'width': options.width,
@@ -172,6 +184,7 @@ class VideoRepositoryImpl implements VideoRepository {
     };
   }
 
+  /// 从历史 JSON 还原请求选项；损坏或缺失字段使用领域默认值。
   VideoGenerationOptions _optionsFromStorage(String? value) {
     if (value == null || value.trim().isEmpty) {
       return const VideoGenerationOptions();
@@ -224,7 +237,7 @@ class VideoRepositoryImpl implements VideoRepository {
         );
       }
     } on FormatException {
-      // Fallback to documented defaults for old/corrupt records.
+      // 请求参数损坏时仍保留任务状态，避免历史记录无法打开。
     }
     return const VideoGenerationOptions();
   }
@@ -242,11 +255,6 @@ class VideoRepositoryImpl implements VideoRepository {
   double _doubleValue(Object? value, double fallback) {
     if (value is num) return value.toDouble();
     return double.tryParse(value?.toString() ?? '') ?? fallback;
-  }
-
-  double? _nullableDouble(Object? value) {
-    if (value is num) return value.toDouble();
-    return double.tryParse(value?.toString() ?? '');
   }
 
   String? _nullableText(Object? value) {
